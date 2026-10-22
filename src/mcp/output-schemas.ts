@@ -1,3 +1,4 @@
+import { railResultSchema, stationOutput } from "@/rail/schemas";
 import { z } from "zod";
 
 const text = z.string();
@@ -20,7 +21,11 @@ const censusMetadata = { topic: z.enum(["population", "age", "sex", "welsh_speak
 const censusMeasure = z.object({ count: integer, percentage: z.number().nullable() });
 const demographics = z.object({ area, denominator: integer, denominator_definition: text, measures: z.record(text, censusMeasure), breakdown: z.array(censusMeasure.extend({ label: text })).optional(), excluded_count: integer.optional(), derivation: text.optional() });
 
+const railOutput = z.union([z.object({ result: railResultSchema }), z.object({ error: text, message: text, candidates: z.array(stationOutput).optional() })]);
+
 export const outputSchemas = {
+  get_live_departures: railOutput,
+  get_next_trains: railOutput,
   summarize_schools_by_ward: output(z.object({ wards: z.array(coverage.extend({ area })), authority_coverage: coverage, geography: geographyMetadata, source_url: text, source_published_at: text, snapshot_imported_at: text, attribution: text, limitations: text })),
   summarize_food_businesses_by_ward: output(z.object({ ...snapshotMetadata, wards: z.array(coverage.extend({ area, rating_counts: z.record(text, integer), numeric_rating_denominator: integer, numeric_rating_percentages: z.record(text, z.number().nullable()), new_rating_pending_count: integer })), authority_coverage: coverage, limitations: text })),
   find_food_businesses: output(z.object({ data_mode: z.literal("snapshot").optional(), source_url: text.optional(), snapshot_age_days: integer.optional(), freshness_warning: text.optional(), geography: geographyMetadata.optional(), authority_coverage: coverage.optional(), ward: area.optional(), businesses: z.array(food), ...paging, source_extract_time: text.nullable(), source_retrieved_at: text, note: text.optional(), attribution: text })),

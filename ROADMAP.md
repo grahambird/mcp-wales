@@ -11,6 +11,10 @@ Retain all ten default tools. Prioritise proving their usefulness and making mai
 
 Name/rating sorting for food and name/pupil-total sorting for schools already exist. Food inspection-date sorting is unavailable in the consumed live API. A general postcode, distance or neighbourhood resolver is not currently exposed. See [the tool guide](docs/TOOLS.md) for exact contracts.
 
+## Rail integration awaiting access
+
+Two gated direct-train tools now have a Darwin JSON connector and local station resolver. Marketplace approval, verification of multiple intermediate-stop results, provider authentication/terms, assistant comparisons and production acceptance remain pending. See [rail activation](docs/rail.md). Existing default tools remain unchanged.
+
 ## Next priorities
 
 1. Agree five core user questions in [the evaluation guide](docs/ai-evaluations.md), compare answers with and without MCP Wales, and record dated findings in [ACCEPTANCE.md](ACCEPTANCE.md).

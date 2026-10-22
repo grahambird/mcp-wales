@@ -1,0 +1,96 @@
+[
+  {
+    "prompt": "When is the next train from Heath High Level?",
+    "tool": "get_live_departures",
+    "arguments": {
+      "station": "Heath High Level"
+    },
+    "max_calls": 1,
+    "baseline": "Pending manual no-MCP comparison",
+    "checks": [
+      "Use live predictions when available; never recommend a cancellation as available",
+      "Preserve requested calling station separately from ultimate destination"
+    ]
+  },
+  {
+    "prompt": "When is the next train to Heath High Level from Cardiff Central?",
+    "tool": "get_next_trains",
+    "arguments": {
+      "from_station": "Cardiff Central",
+      "to_station": "Heath High Level"
+    },
+    "max_calls": 1,
+    "baseline": "Pending manual no-MCP comparison",
+    "checks": [
+      "Use live predictions when available; never recommend a cancellation as available",
+      "Preserve requested calling station separately from ultimate destination"
+    ]
+  },
+  {
+    "prompt": "When is the next train from Cardiff Central to Heath High Level?",
+    "tool": "get_next_trains",
+    "arguments": {
+      "from_station": "Cardiff Central",
+      "to_station": "Heath High Level"
+    },
+    "max_calls": 1,
+    "baseline": "Pending manual no-MCP comparison",
+    "checks": [
+      "Use live predictions when available; never recommend a cancellation as available",
+      "Preserve requested calling station separately from ultimate destination"
+    ]
+  },
+  {
+    "prompt": "Next train from HHL?",
+    "tool": "get_live_departures",
+    "arguments": {
+      "station": "HHL"
+    },
+    "max_calls": 1,
+    "baseline": "Pending manual no-MCP comparison",
+    "checks": [
+      "Use live predictions when available; never recommend a cancellation as available",
+      "Preserve requested calling station separately from ultimate destination"
+    ]
+  },
+  {
+    "prompt": "Next train from Heath Low Level?",
+    "tool": "get_live_departures",
+    "arguments": {
+      "station": "Heath Low Level"
+    },
+    "max_calls": 1,
+    "baseline": "Pending manual no-MCP comparison",
+    "checks": [
+      "Use live predictions when available; never recommend a cancellation as available",
+      "Preserve requested calling station separately from ultimate destination"
+    ]
+  },
+  {
+    "prompt": "Next train from Cardiff Central to Heath Low Level?",
+    "tool": "get_next_trains",
+    "arguments": {
+      "from_station": "Cardiff Central",
+      "to_station": "Heath Low Level"
+    },
+    "max_calls": 1,
+    "baseline": "Pending manual no-MCP comparison",
+    "checks": [
+      "Use live predictions when available; never recommend a cancellation as available",
+      "Preserve requested calling station separately from ultimate destination"
+    ]
+  },
+  {
+    "prompt": "Next train from an imaginary station?",
+    "tool": "get_live_departures",
+    "arguments": {
+      "station": "imaginary station"
+    },
+    "max_calls": 1,
+    "baseline": "Pending manual no-MCP comparison",
+    "checks": [
+      "Use live predictions when available; never recommend a cancellation as available",
+      "Preserve requested calling station separately from ultimate destination"
+    ]
+  }
+]

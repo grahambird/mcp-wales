@@ -14,6 +14,7 @@ Use the smallest quality system that provides useful confidence. Mocked contract
 | Census | Official area resolution and ambiguity, supported topics, category ordering, topic-specific denominators, age 65 and 100+, complete rankings, ties and bounded requests |
 | Geography | Coordinate containment, holes/multipolygons/edges/overlaps/gaps, postcode quality and termination, partial resolution, association reuse/invalidation and complete population reconciliation |
 | Service | Cache bounds/expiry/deduplication, concurrency/deadlines/cooldowns, request and response limits, Origin validation, safe errors/logs, untrusted content, nested output schemas and legacy/current MCP compatibility |
+| Gated rail | Name/CRS resolution, intermediate calls and changes, actual departures, delays/cancellations, London clocks, bounded cache/retries/cooldown, malformed/failed providers and secret-safe results; live filtering pending |
 | Gated waste | Explicit address selection, string UPRNs, malformed/empty schedules, unknown source labels, throttling, caches and privacy-safe logging; no real residential fixtures |
 
 Sorting applies to the complete matching population before pagination: locally for snapshots, upstream where supported. Never sort a page as though it were the complete dataset or exhaust an upstream API to simulate unsupported sorting.

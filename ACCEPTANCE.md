@@ -149,3 +149,13 @@ Automated offline checks and local live acceptance are recorded separately when 
 - New deterministic checks cover request/body limits, supplied-origin validation, FSA cache eviction/expiry/single-flight, outgoing concurrency, queue deadlines, cooldowns, body timeouts, inconsistent pagination/geography, untrusted names, output provenance requirements and diagnostic/secret leakage.
 - **Pending:** actual assistant baseline comparisons and tool-selection/interpretation acceptance using [the evaluation guide](docs/ai-evaluations.md). Offline fixture execution does not establish model behaviour or comparative answer gains.
 - **Pending:** verify deployed Vercel firewall and hosting log settings. Local smoke success is not Vercel-origin verification of these changes. No deployment or directory submission was performed.
+
+
+## 22 October 2026 — gated live rail implementation
+
+- Official public Darwin JSON OpenAPI, developer guidance and terms reviewed; see [rail investigation](docs/rail.md).
+- User has registered for Rail Data Marketplace; account approval has a reported three-day SLA. No credentials are available locally.
+- Two tools are gated by `NATIONAL_RAIL_TOOLS_ENABLED`; existing default discovery remains ten tools.
+- Mocked tests cover project-controlled contracts, including intermediate calling-point verification, multiple services, cancellations, already-departed services, delays and London clocks. These do not establish upstream filter semantics.
+- Pending: live CDF → HHL multiple intermediate-stop verification, CDF → HLL comparison, approved-product base URL/auth/quotas and attribution presentation, Vercel access, manual assistant baselines/evaluations and deployment. No live rail/ChatGPT/production checks are claimed.
+- Final local verification: `npm run check` passed lint, TypeScript, all 230 Vitest tests, six maintenance tests and the production build/runtime bundle check. `git diff --check` passed. Duplicate ignored Next-generated type copies were moved aside locally before the final check; no source configuration change was needed.

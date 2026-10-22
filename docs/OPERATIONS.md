@@ -207,3 +207,7 @@ with bounded downloads and timeouts.
 The daily [production canary](../.github/workflows/production-smoke.yml) checks the deployed service using stable invariants. See [QUALITY.md](../QUALITY.md) for its scope and failure handling. A failed check requires investigation; it is not permission to weaken an invariant.
 
 Full boundary and postcode files are offline rebuild inputs and are excluded from the deployed MCP bundle. The production build verifies this exclusion and prints the traced size. Historical measurements and verification evidence are in [the geography record](geography.md#quality-operation-and-release-evidence); they do not establish current Vercel settings.
+
+## National Rail activation and station refresh
+
+The rail integration is disabled while Rail Data Marketplace account approval and live acceptance are pending. Follow [rail configuration, bounded live checks and activation](rail.md) before setting the server-only key, approved product base URL and enable flag in Vercel. Never put the key in chat, Git, client-side settings or logs. The existing tools continue without rail configuration. The same guide documents the offline station-reference refresh; live departure data has no persistent store.

@@ -38,6 +38,10 @@ try {
   const { tools } = await client.listTools();
   const names = tools.map((tool) => tool.name).sort();
   const expected = ["find_food_businesses", "find_schools", "get_food_business", "get_school", "find_census_areas", "get_area_demographics", "compare_area_demographics", "rank_areas_by_demographic", "summarize_schools_by_ward", "summarize_food_businesses_by_ward"].sort();
+  if (process.env.NATIONAL_RAIL_TOOLS_ENABLED === "true") {
+    expected.push("get_live_departures", "get_next_trains");
+    expected.sort();
+  }
   if (process.env.CARDIFF_WASTE_TOOLS_ENABLED === "true") {
     expected.push("find_waste_collection_addresses", "get_waste_collections");
     expected.sort();

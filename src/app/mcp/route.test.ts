@@ -59,3 +59,18 @@ it("returns protocol errors for malformed, unknown-tool and unsupported-version 
   const unsupported = await POST(new Request("http://localhost:3000/mcp", { method: "POST", headers: { "content-type": "application/json", accept: "application/json, text/event-stream", "mcp-protocol-version": "2099-01-01" }, body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "tools/list", params: { _meta: { "io.modelcontextprotocol/protocolVersion": "2099-01-01" } } }) }));
   expect(unsupported.status).toBe(400);
 });
+
+it("discovers exactly two additional rail tools when enabled, and surfaces missing credentials as an execution error", async () => {
+  const { vi } = await import("vitest");
+  vi.stubEnv("NATIONAL_RAIL_TOOLS_ENABLED", "true");
+  vi.stubEnv("NATIONAL_RAIL_API_KEY", "");
+  try {
+    const { result: list } = await rpc("tools/list");
+    expect(list.tools).toHaveLength(12);
+    const rails = list.tools.filter((tool: { name: string }) => ["get_live_departures", "get_next_trains"].includes(tool.name));
+    expect(rails).toHaveLength(2);
+    for (const tool of rails) expect(tool.annotations).toMatchObject({ readOnlyHint: true, destructiveHint: false, openWorldHint: true });
+    const { result: call } = await rpc("tools/call", { name: "get_live_departures", arguments: { station: "HHL" } });
+    expect(call).toMatchObject({ isError: true, structuredContent: { error: "unavailable" } });
+  } finally { vi.unstubAllEnvs(); }
+});

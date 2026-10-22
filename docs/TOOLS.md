@@ -116,3 +116,9 @@ Summaries include zero wards, exact/approximate allocation counts, authority-wid
 School location is not catchment, admission eligibility or pupils’ residence. FSA-published establishment counts are not a count of every business operating in Cardiff. Missing source locations can leave geography unresolved. Complete source coverage and complete geographical allocation are different properties.
 
 FSA ward outputs identify `data_mode: snapshot`, extract/retrieval dates, age and a warning after 30 days. `get_food_business` remains live and may disagree with a historical snapshot; it shows pending geography if its location changed. Census uses native ward statistics from 2021 on May 2022 boundaries. A shared ward code does not make establishment and Census reporting periods contemporary. See [matching, provenance and limitations](geography.md).
+
+## Rail departures — gated pending marketplace approval and live checks
+
+`get_live_departures` accepts `station` (full National Rail name or CRS) and `limit` (1–10, default 5) for upcoming trains in both directions. `get_next_trains` accepts `from_station`, `to_station` and the same limit for direct trains calling at the requested destination, including intermediate stations. Both cover Great Britain. They appear only with `NATIONAL_RAIL_TOOLS_ENABLED=true` after the [rail activation checks](rail.md).
+
+Results distinguish scheduled times, live predictions and missing predictions; platforms are null when unavailable. Ultimate destinations remain separate from the requested stop. Cancellations and cancelled stops are not available trains. Empty results describe a bounded API window, never prove the last train has gone; upstream failures are explicit execution errors. No connections, tickets, future-date searches or public station/service helper tools.
