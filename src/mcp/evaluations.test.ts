@@ -93,7 +93,11 @@ it.each(["2025-03-26", "2026-07-28"])("keeps discovery and tool execution errors
     const body = await response.text();
     const json = JSON.parse(body.includes("data: ") ? body.split("\n").find(l => l.startsWith("data: "))!.slice(6) : body);
     expect(response.status, body).toBe(200);
-    if (method === "tools/list") expect(json.result.tools).toHaveLength(10);
+    if (method === "tools/list") {
+      expect(json.result.tools).toHaveLength(10);
+      const snapshotTools = ["find_census_areas", "find_schools", "get_school", "summarize_schools_by_ward", "summarize_food_businesses_by_ward"];
+      for (const tool of json.result.tools) expect(tool.annotations).toMatchObject({ readOnlyHint: true, destructiveHint: false, openWorldHint: !snapshotTools.includes(tool.name) });
+    }
     else {
       expect(json.result).toMatchObject({ isError: true, structuredContent: { error: "not_found" } });
       expect(outputSchemas.get_school.safeParse(json.result.structuredContent).success).toBe(true);
@@ -112,4 +116,16 @@ it("requires attribution, dates, limitations and nested fields in output contrac
     delete broken[field];
     expect(outputSchemas.get_area_demographics.safeParse({ result: broken }).success, field).toBe(false);
   }
+});
+
+it("completes the reported Year 12 workflow using the identifier returned by discovery", async () => {
+  const found = await schools.runFindSchools(schools.findSchoolsInput.parse({ name: "Cardiff High" }));
+  const discovery = outputSchemas.find_schools.parse(found.structuredContent);
+  if (!("result" in discovery)) throw new Error("Expected school discovery result");
+  expect(discovery.result.schools).toHaveLength(1);
+  const profile = await schools.runGetSchool({ school_id: discovery.result.schools[0].school_id });
+  const structured = outputSchemas.get_school.parse(profile.structuredContent);
+  if (!("result" in structured)) throw new Error("Expected school profile");
+  expect(structured.result.year_groups.values["Year Group 12"]).toMatchObject({ status: "reported", value: expect.any(Number) });
+  expect(structured.result.sources.year_groups.reporting_period).toBeTruthy();
 });

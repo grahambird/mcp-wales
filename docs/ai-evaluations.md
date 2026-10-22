@@ -18,3 +18,12 @@ Compare baseline and MCP results for access, accuracy, analysis, efficiency and 
 Record dated outcomes in ACCEPTANCE.md, including failures and pending work. Do not fabricate timings, gains or numerical baselines from offline fixtures. If a failure is controlled by this server, add a deterministic regression test. Manual model behaviour remains manual until repeated failures justify automated evaluation costs under QUALITY.md. No model API, account automation or hosted evaluator is required.
 
 Ward comparison cases now include maintained secondary-school counts, complete food-rating distributions, and a rating-5 Grangetown search. Expect one summary call for complete aggregates; check approximation, unresolved coverage, snapshot dates and contemporary-versus-Census reporting periods. Manual baseline and connected-assistant outcomes for this milestone remain pending.
+
+## Reported discovery misses — 22 October 2026
+
+Retest these exact prompts in fresh ChatGPT chats after deploying and refreshing the MCP connection:
+
+- “How many pupils are in Year 12 at Cardiff High School?” Expected: `find_schools` followed by `get_school` using the returned identifier, reporting the Year 12 value and source period (two calls).
+- “Which Cardiff wards have the highest proportion of Welsh speakers?” Expected: `rank_areas_by_demographic` with `metric=welsh_speaking_percentage`, reporting Census 2021 and the residents aged 3+ denominator (one call).
+
+Both prompts are in the existing fixture set; the historical wording of the Welsh-ranking case is retained too. The local workflow test verifies discovery-to-profile lookup and availability of the Year 12 measure. It does not test ChatGPT's choice to call the tools. Record client/model, prompt, actual tool sequence, answer/source interpretation and pass/fail; compare the user's reported pre-change misses with a controlled baseline where possible. No model API or automatic UI testing is introduced.

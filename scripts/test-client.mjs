@@ -48,6 +48,8 @@ try {
   for (const tool of tools) {
     assert(tool.annotations?.readOnlyHint === true, `${tool.name} is not advertised as read-only.`);
     assert(tool.annotations?.destructiveHint === false, `${tool.name} is incorrectly advertised as destructive.`);
+    const snapshotTools = ["find_census_areas", "find_schools", "get_school", "summarize_schools_by_ward", "summarize_food_businesses_by_ward"];
+    assert(tool.annotations?.openWorldHint === !snapshotTools.includes(tool.name), `${tool.name} has an incorrect open-world annotation.`);
     assert(typeof tool.description === "string" && tool.description.length > 0, `${tool.name} has no description.`);
   }
 

@@ -290,5 +290,31 @@
       "Results bounded"
     ],
     "baseline": "Pending manual comparison without MCP Wales"
+  },
+  {
+    "prompt": "How many pupils are in Year 12 at Cardiff High School?",
+    "tool": "find_schools",
+    "arguments": {
+      "name": "Cardiff High"
+    },
+    "max_calls": 2,
+    "checks": [
+      "Use the returned school_id with get_school; read the Year 12 reported value, not the whole-school or sixth-form total.",
+      "State the returned reporting period and source; preserve missing or suppressed values."
+    ],
+    "baseline": "Reported missed tool selection in ChatGPT; controlled before/after comparison pending."
+  },
+  {
+    "prompt": "Which Cardiff wards have the highest proportion of Welsh speakers?",
+    "tool": "rank_areas_by_demographic",
+    "arguments": {
+      "metric": "welsh_speaking_percentage"
+    },
+    "max_calls": 1,
+    "checks": [
+      "Rank all Cardiff wards by percentage, not count, before limiting.",
+      "State Census 2021 and the residents aged 3+ denominator; do not present as current."
+    ],
+    "baseline": "Reported missed tool selection in ChatGPT; controlled before/after comparison pending."
   }
 ]
