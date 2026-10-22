@@ -1,41 +1,38 @@
-# Roadmap for MCP server future development
+# Roadmap
 
-## Potential other data sources
+Retain all ten default tools. Prioritise proving their usefulness and making maintenance understandable before expanding the service. This is a list of priorities and options, not a release commitment.
 
-* Air quality from UK-AIR
-* Green spaces from OS Open Greenspace
-* Listed buildings from Cadw
-* Visitor atractions - unclear where we can get this
-* Crime data from Police street level crime API
-* Transport stops from NaPTAN
-* Bus data from Cardiff Bus https://www.cardiffbus.com/open-data
-* Train times from Darwin https://www.nationalrail.co.uk/developers/darwin-data-feeds/
-* Post office and postbox data
-* Nearby planning application data
-* School performance, inspections and other info - from StatsWales, Estyn
-* Information about colleges, further education and higher education - from StatsWales
-* Information about local government officials through TheyWorkForYou or similar sources
+## Current capability
 
-## Improvement for food safety data
-Add a sort by feature so that users can ask date-based questions and get answers without needing to download the entire dataset
+- Cardiff food hygiene discovery and live details; complete dated ward searches and rating summaries.
+- Cardiff maintained-school discovery, published pupil-size sorting, combined register/StatsWales profiles and ward counts.
+- Census 2021 demographics, comparisons and rankings for supported Welsh authorities and Cardiff wards/MSOAs.
+- Shared official-area resolution and offline school/business location matching. Internal LSOAs do not add LSOA Census queries.
 
-## Possible central feature: Location resolver
-Location resolver that allows a common location capability across tools for use cases where the user specifies a location in their request.
+Name/rating sorting for food and name/pupil-total sorting for schools already exist. Food inspection-date sorting is unavailable in the consumed live API. A general postcode, distance or neighbourhood resolver is not currently exposed. See [the tool guide](docs/TOOLS.md) for exact contracts.
 
-## Schools: possible next steps
+## Next priorities
 
-The first release is a Cardiff maintained-school directory from the Welsh Government register. These are possible follow-ups, not commitments for that release.
+1. Agree five core user questions in [the evaluation guide](docs/ai-evaluations.md), compare answers with and without MCP Wales, and record dated findings in [ACCEPTANCE.md](ACCEPTANCE.md).
+2. Complete applicable assistant and production checks still recorded as pending. Do not infer completion from local tests.
+3. Keep maintenance instructions together in [Operations](docs/OPERATIONS.md). Measure a full geography rebuild before deciding whether incremental reuse is worth retaining; no implementation change is agreed yet.
 
-| Later step | Evidence or condition needed |
+## Possible extensions
+
+Start with a demonstrated user question and the [tool checklist](docs/tool-design-checklist.md), not simply an available dataset.
+
+| Option | Evidence needed before implementation |
 | --- | --- |
-| Nearby-school searches | Validate a reusable postcode-coordinate download; label approximate straight-line distances separately from catchment and admission rules. |
-| Estyn inspections | Confirm permitted automated access and redistribution. Direct links are allowed; structured findings and recommendations remain gated. |
-| School examination results and trends | Obtain a supported school-level API/export or explicit permission for My Local School access. The examined national examination workbook does not supply individual-school results. |
-| Shared profiles and historical joins | Reuse Welsh school numbers; add evidence-backed, dated mappings for identifier changes, closures and mergers when multiple sources are introduced. |
-| Catchments, term dates and capacity | Confirm structured access, reuse terms and school-specific coverage. Admission numbers are not total capacity or live vacancies. |
+| Nearby schools or businesses | Suitable coordinate data; distinguish straight-line distance from catchments or admissions |
+| Estyn inspections | Permitted automated access and redistribution; direct links do not establish permission for structured findings |
+| School exam results/trends | Supported school-level export/API or explicit permission; the examined national workbook does not provide school results |
+| School history, closures and mergers | Authoritative dated mappings using Welsh school identifiers |
+| Catchments, term dates and capacity | Structured access, reuse terms and school-specific coverage; admission numbers are not capacity or vacancies |
+| Census LSOAs or other authorities’ subdivisions | Authoritative dated membership, bounded queries, completeness tests and live acceptance |
+| Neighbourhood aliases | Authoritative boundary evidence; never silently substitute a ward |
+| Current population estimates | Separate source and reporting dates, clearly distinct from Census 2021 |
+| Waste collections | Existing reuse, attribution and release gate in [Operations](docs/OPERATIONS.md#waste-collection-spike) |
 
-Do not scrape unsupported endpoints, generate school rankings or add infrastructure in anticipation of these steps.
+Other source ideas remain unprioritised: UK-AIR air quality, OS Open Greenspace, Cadw listed buildings, visitor attractions, police crime data, NaPTAN stops, Cardiff Bus open data, National Rail Darwin, post offices/postboxes, planning applications, further/higher education and local representatives. Access and reuse terms need review when a concrete question warrants one.
 
-## Census 2021
-
-Implemented initial coverage: Cardiff wards/MSOAs plus Welsh local-authority demographics, comparisons and complete Cardiff rankings. Shared geography now supplies internal Cardiff LSOA coverage and separate school/FSA ward associations. Future Census candidates: verified neighbourhood aliases, native LSOA observations and other authorities’ subdivisions. Add only with authoritative dated membership, bounded queries and coverage tests. Current population estimates would be a separate source with distinct reporting dates.
+Do not scrape unsupported endpoints, introduce school-quality rankings or add infrastructure in anticipation of these options. Follow [QUALITY.md](QUALITY.md#adoption-triggers).

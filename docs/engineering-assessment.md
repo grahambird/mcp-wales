@@ -1,5 +1,7 @@
 # Engineering assessment — 15 October 2026
 
+This is a historical assessment of the 15 October safeguards work, before the shared-geography additions. For current capability see [README](../README.md), safeguards [QUALITY](../QUALITY.md), and procedures [Operations](OPERATIONS.md). Pending checks below remain historical evidence, not confirmation of current deployment state.
+
 ## Existing safeguards
 
 Eight public, read-only tools have bounded validated inputs, structured/text responses and explicit annotations. Tools and source connectors are separate. School snapshots have offline importer/contract checks; Census enforces supported geography, table-specific denominators, historical dates, complete rankings and bounded upstream access. Outputs preserve missing/suppressed values and source attribution. Logging is operational rather than query-based. CI, a daily production canary and monthly freshness review already exist. The initial offline baseline was 123 passing tests in 14 files.

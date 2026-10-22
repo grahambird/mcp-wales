@@ -72,8 +72,8 @@ Keep sources read-only and public. Do not add databases, authentication, paid se
 
 Never commit credentials, private user data, copied production logs or `.env` files. Logs should contain safe operational metadata, not tool arguments or tokens.
 
-## Design and engineering guidance
+## Further guidance
 
-Read the [design principles](docs/design-principles.md) and use the [tool checklist](docs/tool-design-checklist.md) for new integrations. See the [engineering assessment](docs/engineering-assessment.md), [privacy statement](docs/privacy.md) and [AI evaluation guide](docs/ai-evaluations.md). Reuse the shared bounded cache, HTTP guard, logger and output schemas; follow existing mocked tests and `npm run check`.
+Use the [design principles](docs/design-principles.md) and [tool checklist](docs/tool-design-checklist.md) for tool changes. [QUALITY.md](QUALITY.md) defines safeguards and adoption triggers; the [assistant evaluation guide](docs/ai-evaluations.md) covers manual comparisons. Reuse the shared cache, logger, HTTP guard and output schemas where applicable.
 
-Shared geographical references and independently rebuildable establishment associations are documented in [the geography runbook](docs/geography.md). Production builds verify their release manifest. No network access is needed for the normal offline check.
+All data-update, geography-rebuild, deployment and rollback procedures live in [Operations](docs/OPERATIONS.md#updating-public-data). Source definitions and licences live in [DATA_SOURCES.md](DATA_SOURCES.md); [geography](docs/geography.md) explains the reference model. The dated [engineering assessment](docs/engineering-assessment.md) is historical context.

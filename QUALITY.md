@@ -1,85 +1,62 @@
 # Quality strategy
 
-MCP Wales uses the smallest quality system that provides useful confidence. Tests should distinguish stable product behaviour from live public data that can legitimately change.
+Use the smallest quality system that provides useful confidence. Mocked contracts define behaviour controlled by MCP Wales; live public data can legitimately change. Commands and prerequisites are in [Contributing](CONTRIBUTING.md#checks), maintenance procedures in [Operations](docs/OPERATIONS.md#updating-public-data), and dated evidence in [ACCEPTANCE.md](ACCEPTANCE.md).
 
-## Current safeguards
+## Checks on every change
 
-### Deterministic checks on every change
+`npm run check` is the shared local and CI gate: lint, types, Vitest (including offline Python importer checks), maintenance tests and a production build. Tests cover:
 
-GitHub Actions runs `npm run check` on each push and pull request: linting, type-checking, unit tests (including Python importer/geography checks), offline maintenance tests, and a production build. Contributors run the same command locally. Mocked FSA fixtures cover filtering, response mapping, non-numeric and pending ratings, sentinel dates, Cardiff enforcement, upstream failures, and validation boundaries.
+| Area | Stable behaviour to preserve |
+| --- | --- |
+| Food | Cardiff enforcement, filtering, all four upstream sort mappings, bounded pagination, pending/non-numeric ratings, sentinel dates, source metadata and errors |
+| Schools | Directory filters, language classifications, sorting before pagination, pupil-total coverage and missing/suppressed values last, profile identity and independent reporting periods |
+| Importers | Required columns, identifiers, scope, completeness, periods/revisions, rounding, suppression and preservation of existing files on failure |
+| Census | Official area resolution and ambiguity, supported topics, category ordering, topic-specific denominators, age 65 and 100+, complete rankings, ties and bounded requests |
+| Geography | Coordinate containment, holes/multipolygons/edges/overlaps/gaps, postcode quality and termination, partial resolution, association reuse/invalidation and complete population reconciliation |
+| Service | Cache bounds/expiry/deduplication, concurrency/deadlines/cooldowns, request and response limits, Origin validation, safe errors/logs, untrusted content, nested output schemas and legacy/current MCP compatibility |
+| Gated waste | Explicit address selection, string UPRNs, malformed/empty schedules, unknown source labels, throttling, caches and privacy-safe logging; no real residential fixtures |
 
-These tests are the persistent source of truth for behaviour that MCP Wales controls. The gated waste spike additionally covers postcode normalization, ambiguous and empty address results, string UPRNs, bounded results, unusual stream/status values, empty and malformed schedules, throttling/access failures, cache behaviour, simultaneous-request deduplication, and privacy-safe logging. Live residential details are never fixtures.
+Sorting applies to the complete matching population before pagination: locally for snapshots, upstream where supported. Never sort a page as though it were the complete dataset or exhaust an upstream API to simulate unsupported sorting.
 
-### Daily production canary
+School source differences and mismatched same-period year-group sums remain visible. Import reports flag coverage losses and pupil changes above 20% for review rather than assuming they are errors. Independent statistics retain their own reporting dates.
 
-`.github/workflows/production-smoke.yml` calls the deployed Streamable HTTP endpoint once each day. It checks that:
+Both ward summaries reconcile all ward counts plus unresolved records with the complete filtered population. Release verification rejects inconsistent source/reference/association files. Production builds also reject offline boundary/postcode inputs in the MCP runtime bundle.
 
-- exactly the ten expected tools after the shared geography release are discoverable and advertised as read-only;
-- a bounded rating-5 Cardiff search succeeds with valid metadata, attribution, and FSA source links;
-- every returned result satisfies stable shape and rating invariants;
-- a detail lookup agrees with the selected search result;
-- a bounded school search returns valid Cardiff identifiers, directory fields, publication/import dates and attribution, without fixed school names or counts.
+Synthetic fixtures control mutable behaviour. Dated bundled geography examples check the committed reference release. Neither establishes current live values. See [the geography evidence](docs/geography.md#quality-operation-and-release-evidence).
 
-The canary deliberately selects a result dynamically. Do not assert that a particular establishment will retain a fixed rating or remain open: FSA data is live and can change legitimately.
+## Daily production canary
 
-### Release acceptance
+The [scheduled smoke client](.github/workflows/production-smoke.yml) checks:
 
-`ACCEPTANCE.md` records manual checks that cannot be inferred from server tests, especially whether a signed-in ChatGPT account discovers, invokes, and presents the tools appropriately.
+- Discovery of all ten default read-only tools.
+- Bounded live FSA search and dynamically selected detail, valid ratings, Cardiff scope, attribution and source links.
+- Dynamically selected school discovery/profile, identifiers, source dates and statistical value/status shapes.
+- Cardiff Census population and a bounded complete-area ward ranking, official codes, historical dates, topic denominators, percentage arithmetic, unrounded ordering and attribution.
+- Complete ward-summary reconciliation, snapshot dates and bounded ward discovery.
 
-## How to handle failures
+Do not pin live establishment names, IDs, ratings, dates, school counts or demographic values. An upstream outage is a surfaced failure, not a silently skipped check. Waste remains excluded while its release gate is off.
 
-First classify a failure as a MCP Wales regression, an upstream FSA availability/data change, a Vercel problem, or an MCP-host behaviour change. Do not weaken an invariant merely to make a failing check green. When a real defect or production edge case is found, add a deterministic regression fixture and test before or alongside the fix.
+## Assistant and release checks
 
-## Deferred improvements and adoption triggers
+Use [the assistant evaluation guide](docs/ai-evaluations.md) for representative questions with and without MCP Wales. Offline prompt fixtures validate expected arguments and tool contracts; they do not measure actual tool selection, interpretation or answer improvement.
 
-Keep these deferred until their trigger occurs:
+Record performed checks, failures and pending work in [ACCEPTANCE.md](ACCEPTANCE.md). Local tests cannot prove Vercel-origin access, deployed firewall/log settings or signed-in ChatGPT behaviour. Preserve historical records rather than treating old results as current acceptance.
 
-- **Prompt-to-tool eval cases:** the reusable cases now cover Census, schools, food, unsupported and no-call questions under the agreed design-principles work. Use [the evaluation guide](docs/ai-evaluations.md); add cases for observed failures. Actual assistant comparisons remain manual.
-- **Automated model-based evals:** consider only when prompt behaviour changes frequently enough to justify API cost and grader maintenance. Keep deterministic checks as the primary gate and calibrate model graders with human review.
-- **Persistent monitoring and alerting:** add when traffic or reliability expectations make Vercel's short Hobby log retention insufficient.
-- **Distributed caching or analytics:** add only when measured traffic, latency, or FSA limits require them.
-- **Waste production release:** enable only after Cardiff Council's reuse and attribution guidance and a Vercel-origin check are recorded. Until then, keep its environment gate off and exclude it from the production canary.
-- **Automated ChatGPT UI testing:** defer while account-specific manual release acceptance remains quick and reliable.
+The reported 18-call largest-school query led to pupil-total sorting in discovery. The live FSA coordinate-casing defect became a deterministic regression fixture. Follow that pattern: turn confirmed project defects into targeted regression tests.
 
-Avoid introducing an eval platform, database, OpenAI API key, or paid monitoring service solely in anticipation of future scale.
+## Failure handling
 
-School-directory contract tests use mocked records for filtering, pagination, Cardiff scope and language grouping. A separate bundled-snapshot check validates unique string IDs, required fields and provenance. Searches make no upstream requests.
+Classify a failure as a project regression, upstream availability/data change, hosting problem or MCP-host behaviour change. Investigate before changing a check; do not weaken an unexplained invariant to make CI green. Compare numerical answers with the same source table/version and geography, respecting disclosure-control differences and missing/suppressed data.
 
-## Discovery design principle
+## Adoption triggers
 
-Expose useful sorting supported by the consumed source using `sort_by`, `sort_order` and bounded `limit`. Filter and sort the complete matching dataset before pagination: locally for bundled data, server-side for live APIs. Never sort an already paginated subset or make exhaustive upstream requests to simulate unsupported sorting. Preserve defaults and document source limitations; keep each connector simple.
+| Improvement | Introduce only when |
+| --- | --- |
+| More prompt cases | An observed failure or new supported task warrants them |
+| Automated model evaluations | Frequent prompt behaviour changes justify API cost and grader maintenance; calibrate against human review |
+| Persistent monitoring/alerting | Traffic or reliability needs exceed the existing hosting logs and canary |
+| Distributed caching or analytics | Measured traffic, latency or provider limits require them |
+| Automated ChatGPT UI testing | Account-specific manual acceptance stops being quick and reliable |
+| Waste production release | Council reuse/attribution guidance and required private/Vercel checks are recorded in acceptance |
 
-Deterministic sorting tests cover first-five requests, school ties and adjacent pages, all four FSA sort mappings, bounded requests, cache separation, invalid inputs and preservation of missing dates/non-numeric ratings. Live canaries continue to use stable invariants.
-
-## School statistics quality
-
-The canary selects a school from discovery and checks its combined profile identity, source dates, attribution and value/status shapes; it does not fix school names, counts, pupil values or reporting dates. Offline importer tests run through Vitest and require Python 3 in development/CI (already available on the Ubuntu runner). They cover representative primary, secondary and Welsh-medium exports, schema/period/revision failures, suppression, rounding, identifiers and preservation of existing files on failure.
-
-Source differences and mismatched same-period year-group sums are preserved and surfaced. Refresh reports flag coverage losses and pupil changes above 20% for review, rather than automatically treating them as errors. Independent updates retain unrelated sections and their own periods.
-
-## School size discovery regression
-
-ChatGPT needed 18 calls to answer “Which is the largest school in Cardiff?” after individual profiles launched. Pupil-total sorting now supports that query in one bounded discovery call. Deterministic fixtures verify first-five ordering before pagination, filters, zeros, ties, adjacent pages, incomplete coverage and missing/suppressed totals last in either direction. Manual ChatGPT acceptance confirms argument selection; no LLM calls or eval platform are introduced.
-
-## Census quality
-
-Synthetic contract tests cover geography resolution, explicit selection for approximate names, dimension/category order, disclosure-control-compatible topic denominators, age 65 and 100+, exclusions, malformed/incomplete observations, bounded batching, all-area rankings, ties, failures, caching and throttling. Never persist live observations as an application dataset. Mocked contracts remain the behavioural truth.
-
-The existing production canary additionally calls Cardiff TS001 and a bounded TS033 ward ranking. It checks the complete eligible catalogue size, valid official codes, census/boundary dates, counts, population bases, percentage arithmetic, unrounded ordering and ONS attribution. Live demographic values are not fixed assertions. An ONS outage is surfaced as a canary failure, not silently skipped.
-
-`scripts/fixtures/census-prompts.json` records representative prompt-to-tool expectations for manual ChatGPT acceptance; no LLM evaluator or paid infrastructure is introduced. Before release, compare numerical results with the same ONS table/version and record Vercel-origin access in ACCEPTANCE.md. Keep checks pending until actually performed.
-
-## Design and security regression checks
-
-Follow the [principles](docs/design-principles.md) and [tool checklist](docs/tool-design-checklist.md). Mocked tests cover the HTTP byte/origin guard, FSA cache/concurrency/cooldowns, streamed response bounds, disclosure safety, nested output schemas and legacy/current protocol paths. Keep existing missing/suppressed-data, sorting and provenance contracts. Instance-local controls cannot prove a Vercel firewall is configured. See the [assessment](docs/engineering-assessment.md) for pending deployment/manual checks.
-
-
-## Shared geography quality
-
-`npm run check` covers coordinate containment (holes, multipolygons, edges, overlaps and gaps), postcode normalisation/termination/quality, area ambiguity, partial resolution, source-only incremental reuse, new/changed/removed locations, reference and matcher invalidation, full rebuilds, complete aggregation and release-manifest consistency. Offline Python importer tests reject incomplete, wrong-scope and malformed FSA extracts and changed reference input checksums. Source records and derived associations remain separate. Dated public school/business examples in Grangetown, Rhiwbina and Llanishen test the bundled reference release; synthetic fixtures control mutable behaviour.
-
-Both summary tools reconcile ward totals plus unresolved records with their full filtered source population. No aggregate is computed from a discovery page. Production-build verification rejects mismatched source/reference/association files. Live FSA coordinate casing has a deterministic regression fixture. Existing live-record, sorting, throttling and MCP compatibility tests remain intact.
-
-Canaries use codes from the official catalogue and dynamically selected live records; they do not pin live ratings, establishments, dates or snapshot population sizes. Manual assistant comparisons and Vercel-origin checks remain pending; see [geography release evidence](docs/geography.md#quality-operation-and-release-evidence).
-
-The production build also checks its MCP file trace to prevent offline boundary/postcode reference inputs from entering the deployed server. Public queries use only the catalogue, precomputed relationships/associations and relevant source records.
+Do not add a database, hosted evaluation platform, LLM dependency, authentication or paid infrastructure without demonstrated need and explicit approval. Use the [design principles](docs/design-principles.md) and [tool checklist](docs/tool-design-checklist.md) for tool changes; reuse existing cache, logger, HTTP guard and output schemas.

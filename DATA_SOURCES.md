@@ -93,17 +93,7 @@ Import time is not the publisher's update time. The data is a snapshot, not a gu
 
 ### Manual refresh
 
-1. Check the official register page for a newer release and its publication date. Download its linked ODS locally; do not assume the old URL is current.
-2. Use Python 3 (standard library only) to regenerate the snapshot:
-
-   ```bash
-   python3 scripts/import-schools.py /path/to/register.ods --published-at YYYY-MM-DD --download-url https://www.gov.wales/path/to/register.ods
-   ```
-
-3. Review changes in counts, identifiers, school details and language labels. The importer rejects changed columns, missing required fields and duplicate IDs. Investigate unexpected removals rather than inferring closures.
-4. Run `npm run check`, review the JSON diff, and deploy the reviewed update. A failed import must not replace the previous snapshot.
-
-The importer selects only the `Maintained` sheet and Cardiff LA code; it neither adds application dependencies nor performs network requests. Runtime searches use bundled JSON.
+Follow the [school-register procedure](docs/OPERATIONS.md#school-register) in the maintenance runbook, including rebuilding geography associations before the final checks.
 
 ## FSA sorting capability — checked 12 October 2026
 
@@ -131,35 +121,7 @@ Reuse follows OGL v3 through the dataset pages' linked <https://www.gov.wales/co
 
 ### Independent manual refresh
 
-Python 3 standard library only; no network calls in the importer or runtime school tools.
-
-1. Choose one kind and its dataset ID above. Check its dataset page, English metadata, definitions and reporting period. Record the census date from the relevant official census report, not from the publication timestamp.
-2. Download metadata before, the full supported CSV, then metadata after. The export preserves source notes and published rounding. No HTML scraping or undocumented endpoint is needed:
-
-   ```bash
-   curl -fsS "https://api.stats.gov.wales/v2/DATASET_ID?language=en-gb" -o /tmp/metadata-before.json
-   curl -fsS "https://api.stats.gov.wales/v2/DATASET_ID/data?format=csv&language=en-gb" -o /tmp/schools.csv
-   curl -fsS "https://api.stats.gov.wales/v2/DATASET_ID?language=en-gb" -o /tmp/metadata-after.json
-   ```
-
-3. Create a candidate and change report (replace kind, period and date as appropriate):
-
-   ```bash
-   python3 scripts/import-statswales.py characteristics /tmp/schools.csv --metadata-before /tmp/metadata-before.json --metadata-after /tmp/metadata-after.json --period 2025/26 --census-date 2026-01-20 --candidate /tmp/characteristics-candidate.json --report /tmp/characteristics-report.json
-   ```
-
-   The importer refuses to write directly to its canonical snapshot. It checks dataset/revision consistency, columns, identifiers, duplicate measures, period, numeric ranges, notes and rounding. Changed schemas or unfamiliar notes require source review before adapting the parser. It validates all input rows before narrowing to Cardiff. Cardiff authority and the 681 school prefix must agree in characteristics; the other exports use these validated Welsh school identifiers. Geography codes are not school IDs.
-
-4. Review the report: missing register schools, unmatched Cardiff IDs, added/removed IDs, changed records, source characteristics, periods/revisions, pupil changes above 20%, and same-period year-group discrepancies. Changes may be valid. Never infer closure or silently change IDs. Retain raw inputs and reports outside the runtime bundle for audit.
-5. After review, copy the candidate beside the destination and rename it into place, so replacement is atomic. Update only the selected source:
-
-   ```bash
-   cp /tmp/characteristics-candidate.json src/schools/statswales/characteristics.json.pending
-   mv src/schools/statswales/characteristics.json.pending src/schools/statswales/characteristics.json
-   npm run check
-   ```
-
-6. Review the Git diff and deploy the tested update. Git preserves previous snapshots. If download or validation fails, stop before promotion; the previous snapshot remains intact. When updating totals and year groups separately, check the report again after both imports. Different periods stay explicitly labelled in profiles and are not combined.
+Follow the [StatsWales procedure](docs/OPERATIONS.md#statswales-school-statistics) in the maintenance runbook. Each statistics snapshot can be updated independently.
 
 Supported CSV downloads stream the complete, modest national dataset once during manual refresh (currently about 1,441, 11,972 and 7,205 rows respectively), then bundle only Cardiff rows. This is a documented bulk export, not exhaustive runtime search. API v2 also supports filtered and paginated JSON and sorting, but runtime requests are unnecessary for this snapshot design. No new source-specific numerical usage limit was established; keep acquisition sequential and stop on upstream errors.
 
@@ -196,36 +158,7 @@ ONS documents 120 requests/10 seconds, 200/minute, and 15/10 seconds for high-de
 
 ## Monthly freshness review
 
-`.github/workflows/source-freshness.yml` runs on the first of each month at
-08:23 UTC and can also be started with **Run workflow** in GitHub Actions.
-It compares the school-register ODS link, workbook SHA-256 and available page
-modification metadata, StatsWales revision IDs and reporting periods, and ONS
-latest-version links with committed snapshots and pins. It does not import,
-change dataset versions, or deploy anything. Geography remains a manual review
-because newer boundaries may not match Census 2021.
-
-Run locally with Python 3 and curl (no npm dependencies or credentials):
-
-```bash
-python3 scripts/test-source-freshness.py
-python3 scripts/check-source-freshness.py --report /tmp/source-freshness.md
-```
-
-Each source reports unchanged, update available, or check failed. An update
-requires the existing manual review/import/test/deploy procedure above. A check
-failure fails the workflow and requires investigating availability or metadata
-shape; it never counts as unchanged. This is a change detector, not a guarantee
-that the publisher has corrected every outdated record.
-
-The workflow publishes a run summary and maintains one bot-owned GitHub issue,
-“Review public-source freshness”, while updates or failures remain. An unchanged
-report does not create an issue; when all checks become unchanged, the existing
-issue closes. Issue creation uses only the workflow's built-in GitHub token with
-`issues: write`; no additional secret is needed. Repository Issues and scheduled
-Actions must be enabled. The schedule starts after the workflow reaches the
-default branch; GitHub may delay scheduled runs. Source checks run sequentially
-with bounded downloads and timeouts.
-
+The monthly workflow detects source changes without importing or deploying them. See [scheduled checks and freshness review](docs/OPERATIONS.md#scheduled-checks-and-freshness-review) for commands, outcomes and follow-up.
 
 ## Shared geography and FSA ward snapshots
 

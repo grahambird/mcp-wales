@@ -48,40 +48,7 @@ Area names resolve to one exact official name/code or published Welsh alias. Par
 
 ## Manual refresh and rebuild
 
-Run commands from the repository root using Node 24+, Python 3 and curl. Large raw inputs stay outside the application bundle. Retain input directories and reports locally for audit; do not commit the full national products. A fresh input directory checks publisher corrections; an existing directory reuses its pinned downloads.
-
-**Reference preparation**, independent of schools/FSA acquisition:
-
-```bash
-python3 scripts/download-geography.py /tmp/geography-inputs
-python3 scripts/prepare-geography.py /tmp/geography-inputs --candidate /tmp/geography-references
-```
-
-Download is restricted to official lookup membership and explicit ward codes, with complete service pagination and cardinality checks. Preparation validates checksums, scope, codes, rings, coordinate system and statistical/postcode hierarchies before writing a candidate. The raw `inputs.json` manifest pins all acquired files. To reproduce exactly, retain that directory; publishers may correct data in place.
-
-**FSA source refresh**, independent of references and association calculation:
-
-```bash
-curl -fsSL --max-time 60 https://ratings.food.gov.uk/api/open-data-files/FHRS556en-GB.xml -o /tmp/cardiff-fsa.xml
-python3 scripts/import-fsa.py /tmp/cardiff-fsa.xml --expected-count COUNT_FROM_OFFICIAL_LISTING --candidate /tmp/fsa-source.json
-```
-
-Use the count for that extract from the [official download listing](https://ratings.food.gov.uk/open-data), not a fixed historical count. If listing and extract disagree, stop and acquire a consistent pair; never weaken completeness validation. The XML header count, success status, Cardiff scope, scheme and unique FHRSIDs are checked. This is a full supported authority export, not exhaustive runtime search.
-
-**Incremental enrichment**, from existing local source files:
-
-```bash
-node scripts/build-geography.mts --references /tmp/geography-references --schools src/schools/directory.json --fsa /tmp/fsa-source.json --previous src/geography/data/W06000015 --candidate /tmp/geography-release
-node scripts/verify-geography.mts /tmp/geography-release src/schools/directory.json /tmp/geography-release/fsa-source.json
-```
-
-For a source-only refresh, `--references src/geography/data/W06000015` reuses existing references. For a reference-only rebuild, `--fsa src/fsa/source.json` reuses retained FSA data. A school-only update uses the normal school importer, then rebuilds against existing FSA and references. Both association candidates are emitted as a consistent set, but unchanged records retain their calculations. No source downloads occur in the builder.
-
-Location fingerprints include normalised address, postcode and coordinates: a same-postcode relocation is reconsidered; rating/name-only updates do not cause location recalculation. New records are calculated, missing IDs are removed from the new association population and reported without inferring closure. A reference or matcher-version change invalidates affected authority associations. Add `--full` to recalculate everything. Review `report.json` for reuse, recalculation, removals and unresolved counts.
-
-**Promotion**: review the candidate/report, then copy the candidate's reference, spatial-relation, association and release files together into `src/geography/data/W06000015/`; copy `fsa-source.json` to `src/fsa/source.json`. Preserve independently updated school source files. Run `npm run check`, review the Git diff and deploy the whole tested revision. `npm run build` also verifies manifest checksums, source fingerprints, association populations and versions before Next builds. A partial copy cannot produce a successful release build.
-
-Production publication is atomic at the immutable deployment level. Candidate files and local edits are not served to production. If acquisition, validation or build fails, leave the deployed version alone. Roll back the complete Git revision/deployment; do not roll back one association file independently. No runtime filesystem writes occur.
+Use the [maintenance runbook](OPERATIONS.md#geography-and-fsa-ward-snapshots) for source acquisition, reference preparation, association rebuilds, promotion and rollback. This document explains the geography model and its limitations.
 
 ## Responses and limitations
 

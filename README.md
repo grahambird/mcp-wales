@@ -35,15 +35,19 @@ For live checks against the local production build, run `npm run build` followed
 
 ## Find your way around
 
-- [Contributing](CONTRIBUTING.md): project map, workflow, checks and an example change.
-- [Tool guide](docs/TOOLS.md): inputs, examples, interpretation and errors.
-- [Operations](docs/OPERATIONS.md): deployment, logging, privacy and the waste release gate.
-- [Shared geography](docs/geography.md): ward comparisons, accuracy, three data layers and independent refreshes.
-- [Data sources](DATA_SOURCES.md): licences, snapshots, refresh procedures and monthly freshness checks.
-- [Quality strategy](QUALITY.md): test expectations and when more infrastructure is justified.
-- [Release acceptance](ACCEPTANCE.md): manual verification records.
-- [Roadmap](ROADMAP.md): possible future work.
-- [Project migration](MIGRATION.md): rename and integration notes.
+| I want to… | Read |
+| --- | --- |
+| Use a tool or understand its results | [Tool guide](docs/TOOLS.md) |
+| Change the code or run checks | [Contributing](CONTRIBUTING.md) |
+| Update data, deploy or investigate a failure | [Maintenance and operations](docs/OPERATIONS.md) |
+| Check source definitions, dates or licences | [Data source register](DATA_SOURCES.md) |
+| Understand ward matching and its accuracy | [Geography reference](docs/geography.md) |
+| Understand safeguards and when to add infrastructure | [Quality strategy](QUALITY.md) |
+| Test whether tools improve assistant answers | [Assistant evaluation guide](docs/ai-evaluations.md) |
+| See what was actually verified | [Dated acceptance records](ACCEPTANCE.md) |
+| See priorities and possible extensions | [Roadmap](ROADMAP.md) |
+
+The [engineering assessment](docs/engineering-assessment.md) and [migration notes](MIGRATION.md) are historical context, not current release acceptance.
 
 ## Design and licence
 
@@ -55,6 +59,6 @@ Next.js hosts the public information page and MCP endpoint on Vercel. There is n
 
 Project code is MIT-licensed. Public datasets have separate attribution and licence requirements; see [DATA_SOURCES.md](DATA_SOURCES.md).
 
-## Design and engineering guidance
+## Design guidance
 
-Read the [design principles](docs/design-principles.md) and use the [tool checklist](docs/tool-design-checklist.md) for new integrations. See the [engineering assessment](docs/engineering-assessment.md), [privacy statement](docs/privacy.md) and [AI evaluation guide](docs/ai-evaluations.md). Reuse the shared bounded cache, HTTP guard, logger and output schemas; follow existing mocked tests and `npm run check`.
+Read the [design principles](docs/design-principles.md) and use the [tool checklist](docs/tool-design-checklist.md) before changing tools. See the [privacy statement](docs/privacy.md) for data handling and hosting boundaries. Contributor instructions and required checks live in [Contributing](CONTRIBUTING.md).
