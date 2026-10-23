@@ -8,7 +8,7 @@ const capabilities = [
   {
     title: "Live trains",
     description: "Check upcoming departures, platforms, delays and cancellations, or find the next direct train between stations. Start with Welsh journeys; rail coverage extends across Great Britain.",
-    prompts: ["When is the next train from Heath High Level into Cardiff?", "When is the next train from Cardiff Central to Heath High Level?", "Show departures from Cardiff Queen Street"],
+    prompts: ["When is the next train from Llanishen into Cardiff?", "When is the next train from Barry to Cardiff Queen Street?", "Show departures from Cardiff Bay"],
     note: "Times use the UK local time zone. Direct trains only, within the next two hours; no tickets or journeys requiring changes. Live information can change.",
   },
   {
