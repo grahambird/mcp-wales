@@ -14,21 +14,29 @@ The smallest candidate workaround is one `GetDepBoardWithDetails/{crs}` request 
 
 `GetServiceDetails/{serviceId}` exposes actual departure `atd`, which board items lack. Up to ten bounded detail calls exclude confirmed departures without dropping trains merely because their scheduled/expected time is past. An expired/null detail, malformed response or failed detail call fails the operation as unavailable, rather than pretending there are no trains. The connector uses the board's generation time for its HH:mm values, converts known times to ISO UTC with Europe/London clock rules, and returns null for uncertain/repeated autumn clock times. No timetable-derived prediction is invented.
 
-The public schema's host is `localhost`/HTTP and its documentation describes Basic authentication. Do not use that generated host as a deployment endpoint. Configure the actual HTTPS product base URL and authentication from the approved RDM subscription. The current client implements the marketplace `x-apikey` convention; verify that against the approved product before activation. The host/path allowlist prevents accidental credential forwarding; redirects are rejected.
+The public schema's host is `localhost`/HTTP and its documentation describes Basic authentication. Do not use that generated host as a deployment endpoint. Configure the actual HTTPS product base URL and authentication from the approved RDM subscription. The user-supplied Marketplace curl examples on 23 October 2026 confirm `x-apikey` for both products. Departure boards and Service Details have separate product base URLs and independently configured keys; never send the board key to the details product as a fallback. The host/path allowlist prevents accidental credential forwarding; redirects are rejected.
+
+## Local live evidence — 23 October 2026
+
+Both product keys authenticated through the local MCP server. The bounded smoke passed HHL by name and CRS (five results each), CDF → HHL (four) and CDF → HLL (three). Destination results require matching subsequent calling points, confirming multiple intermediate-stop results for this sample. Counts are observations, not invariants. A live-discovered HTTP 400 for literal `filterCrs=null` was fixed by omitting optional filters when no destination is requested; regression coverage asserts omission. The user subsequently compared results retrieved at 19:15:44–45 BST with National Rail boards and reported agreement, with roughly one-minute differences in revised delayed-train departure predictions. This is user-reported acceptance for the sample, not a synchronized feed audit. Protected Vercel Preview initialization, 12-tool discovery and all four bounded live rail cases subsequently passed on 23 October 2026 using authenticated CLI requests; both product subscriptions work from Vercel. See ACCEPTANCE.md for the deployment URL and exact scope. Production acceptance below remains pending.
 
 ## Configuration and acceptance after account approval
 
-The account has been registered; the user reports an approval SLA of three days. No approval date, credentials, live provider check or deployment is assumed.
+On 23 October 2026 the user confirmed Marketplace account access and free Live Departure Board and Service Details products, and supplied both endpoints and redacted curl examples. The user reports both require credit to “National Rail”; results include “Powered by National Rail.” Full subscription terms/quotas and any additional branding requirements still need review. Local credentials and live provider access have subsequently been verified as recorded above; no deployment has been performed.
 
 Add server-only values to `.env.local` and Vercel preview environment settings, never chat, source control or a `NEXT_PUBLIC_` setting:
 
 ```dotenv
-NATIONAL_RAIL_API_KEY=<consumer key from the public JSON product>
-NATIONAL_RAIL_API_BASE_URL=https://api1.raildata.org.uk/<approved-product>/LDBWS/api/20220120
+NATIONAL_RAIL_API_KEY=<Live Departure Board consumer key>
+NATIONAL_RAIL_API_BASE_URL=https://api1.raildata.org.uk/1010-live-departure-board-dep1_2/LDBWS/api/20220120
+NATIONAL_RAIL_SERVICE_DETAILS_API_KEY=<Service Details consumer key>
+NATIONAL_RAIL_SERVICE_DETAILS_API_BASE_URL=https://api1.raildata.org.uk/1010-service-details1_2/LDBWS/api/20220120
 NATIONAL_RAIL_TOOLS_ENABLED=true
 ```
 
 The tools are absent from discovery unless the explicit enable flag is true. Missing/invalid configuration produces an execution error with code `unavailable`. Existing tools require no rail credentials. Keep production disabled until the following are recorded:
+
+Use each product’s own Consumer Key from its subscription. The connector requires both keys and both URLs; it does not assume keys are interchangeable. The board product supplies `GetDepBoardWithDetails/{crs}`; the separate details product supplies `GetServiceDetails/{serviceid}`.
 
 1. Check the subscribed product's actual OpenAPI/base URL, auth header, quotas, terms and supported operations against the client.
 2. Enable in a local/preview environment and run `node scripts/test-rail-client.mjs http://127.0.0.1:3000` (or supply the preview URL).

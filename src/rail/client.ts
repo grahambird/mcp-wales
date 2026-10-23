@@ -12,9 +12,10 @@ let starts: number[] = [];
 let cooldown = 0;
 const wait = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 const unavailable = () => new RailError("unavailable", "National Rail live information is temporarily unavailable. Please try again later.");
-function configuration() {
-  const key = process.env.NATIONAL_RAIL_API_KEY;
-  const base = process.env.NATIONAL_RAIL_API_BASE_URL;
+type RailProduct = "board" | "detail";
+function configuration(product: RailProduct) {
+  const key = product === "board" ? process.env.NATIONAL_RAIL_API_KEY : process.env.NATIONAL_RAIL_SERVICE_DETAILS_API_KEY;
+  const base = product === "board" ? process.env.NATIONAL_RAIL_API_BASE_URL : process.env.NATIONAL_RAIL_SERVICE_DETAILS_API_BASE_URL;
   if (!key || !base) throw unavailable();
   let url: URL;
   try { url = new URL(base); } catch { throw unavailable(); }
@@ -49,9 +50,9 @@ async function readJson(response: Response) {
     return JSON.parse(Buffer.concat(chunks).toString("utf8")) as unknown;
   } finally { reader.releaseLock(); }
 }
-async function request<T extends z.ZodType>(path: string, schema: T, deadline: number): Promise<{ value: z.infer<T>; retrievedAt: string }> {
-  const { key, base } = configuration();
-  return cache.getOrLoad(path, async () => {
+async function request<T extends z.ZodType>(product: RailProduct, path: string, schema: T, deadline: number): Promise<{ value: z.infer<T>; retrievedAt: string }> {
+  const { key, base } = configuration(product);
+  return cache.getOrLoad(`${base}/${path}`, async () => {
     for (let attempt = 0; attempt < 2; attempt++) {
       await acquire(deadline);
       const started = performance.now();
@@ -84,10 +85,11 @@ async function request<T extends z.ZodType>(path: string, schema: T, deadline: n
   });
 }
 export function getRailBoard(origin: string, destination: string | undefined, deadline: number) {
-  const query = new URLSearchParams({ numRows: "10", filterCrs: destination ?? "null", filterType: "to", timeOffset: "0", timeWindow: "120" });
-  return request(`GetDepBoardWithDetails/${origin}?${query}`, boardSchema, deadline);
+  const query = new URLSearchParams({ numRows: "10", timeOffset: "0", timeWindow: "120" });
+  if (destination) { query.set("filterCrs", destination); query.set("filterType", "to"); }
+  return request("board", `GetDepBoardWithDetails/${origin}?${query}`, boardSchema, deadline);
 }
 export function getRailDetail(id: string, deadline: number) {
-  return request(`GetServiceDetails/${encodeURIComponent(id)}`, detailSchema, deadline);
+  return request("detail", `GetServiceDetails/${encodeURIComponent(id)}`, detailSchema, deadline);
 }
 export function clearRailStateForTests() { cache.clear(); starts = []; cooldown = 0; }

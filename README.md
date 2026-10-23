@@ -12,7 +12,7 @@ Visit [mcp.wales](https://mcp.wales). Connect an MCP client to `https://mcp.wale
 
 Food ratings describe hygiene, not food quality. School statistics describe their published census period, and Census 2021 figures describe 2021 rather than today's population. Responses include source information and dates.
 
-The two live rail tools are implemented behind an enable flag, pending Rail Data Marketplace approval and live acceptance. See [rail setup and limitations](docs/rail.md).
+The two live rail tools are implemented behind an enable flag, with local live contracts passing; official-board comparisons and production acceptance remain pending. See [rail setup and limitations](docs/rail.md).
 
 The waste-collection prototype is disabled by default pending reuse and release checks. See [operations](docs/OPERATIONS.md#waste-collection-spike).
 

@@ -159,3 +159,43 @@ Automated offline checks and local live acceptance are recorded separately when 
 - Mocked tests cover project-controlled contracts, including intermediate calling-point verification, multiple services, cancellations, already-departed services, delays and London clocks. These do not establish upstream filter semantics.
 - Pending: live CDF → HHL multiple intermediate-stop verification, CDF → HLL comparison, approved-product base URL/auth/quotas and attribution presentation, Vercel access, manual assistant baselines/evaluations and deployment. No live rail/ChatGPT/production checks are claimed.
 - Final local verification: `npm run check` passed lint, TypeScript, all 230 Vitest tests, six maintenance tests and the production build/runtime bundle check. `git diff --check` passed. Duplicate ignored Next-generated type copies were moved aside locally before the final check; no source configuration change was needed.
+
+
+## 23 October 2026 — separate rail product configuration
+
+- User supplied Marketplace departure-board and Service Details endpoints and redacted curl examples confirming `x-apikey` for each. User reports both products are free and require credit to “National Rail”. These are user-reported subscription details, not live authentication or full terms verification.
+- Connector now requires independently configured Service Details base URL/key instead of sending details requests to the board product. Cache entries include the product base URL. Results credit National Rail and retain the NRE licence acknowledgement.
+- Deterministic regression tests cover separate routing/keys, missing or unsafe details configuration and cache isolation across product URLs. `npm run check` passed lint, TypeScript, 237 Vitest tests, six maintenance tests, production build and runtime-bundle checks. `git diff --check` passed.
+- Live credentials, intermediate-stop filtering, production access, full terms/quotas/branding and assistant comparisons remain pending. No deployment or live authenticated rail checks were performed.
+
+
+## 23 October 2026 — first authenticated local rail attempt
+
+- Added the supplied product base URLs and local rail enable flag to ignored `.env.local`, preserving existing secrets. Checked only key presence/format flags; no secret values were displayed.
+- Started the local MCP server on loopback port 3001 and ran `scripts/test-rail-client.mjs`. Its first HHL departure-board request reached the provider and returned HTTP 401; the smoke script failed on the execution error. Stopped without further provider requests. Service Details authentication and all live data/filtering checks remain unverified.
+- Both local rail key settings are present without whitespace or obvious placeholder prefixes. User needs to verify each subscription's Consumer Key and active status; the cause of the 401 is not established. No deployment performed.
+- Next.js emitted a security upgrade recommendation during startup; no dependency changes were made in this rail check.
+
+
+## 23 October 2026 — local live rail contracts passed
+
+- After the user corrected the departure-board Consumer Key, the initial request returned HTTP 400. Two bounded direct checks isolated the cause: literal `filterCrs=null` returned 400, while omitting optional filtering returned HTTP 200. Updated the connector to omit `filterCrs`/`filterType` without a destination, and updated the deterministic regression assertion.
+- The local MCP smoke client then passed all four cases: HHL by full name (five results), HHL by CRS (five), CDF → HHL (four), and CDF → HLL (three). Both independently configured API subscriptions authenticated successfully. Counts are dated observations, not persistent assertions. Successful destination results require matching subsequent calling points, establishing multiple intermediate-stop results for this live sample.
+- `npm run check` passed lint, TypeScript, 237 Vitest tests, six maintenance tests, production build and runtime-bundle checks; `git diff --check` passed. Live responses were not saved to disk.
+- Independent comparison of arrivals, final destinations and both HHL directions against the official National Rail boards remains pending, as do Vercel-origin access, full subscription terms/quotas/branding, assistant evaluations and deployment. Local success does not establish production acceptance.
+
+
+## 23 October 2026 — user comparison with National Rail boards
+
+- User compared the displayed local MCP results retrieved at 19:15:44–45 BST with the National Rail boards and reported “That all looks good”, with roughly one-minute differences in revised departure predictions for delayed trains. This is user-reported manual acceptance, not an independent agent browser comparison or a synchronized feed audit.
+- The displayed comparison covered HHL departures in both directions, CDF → HHL and CDF → HLL, including an explicitly cancelled service, delayed services, intermediate arrivals and final destinations. Accepted for this sample; the cause of the small prediction differences was not independently established.
+- Vercel-origin access, full subscription terms/quotas/branding review, assistant comparisons and production deployment remain pending.
+
+
+## 23 October 2026 — Vercel Preview rail acceptance
+
+- User reports subscription wording “Fair usage limit: No”. Recorded as no stated fair-use limit, not a guarantee of unlimited capacity; connector safeguards remain unchanged.
+- Deployed the current rail checkout to Preview: https://mcp-wales-h5scpz1r4-grahambirds-projects.vercel.app (deployment `dpl_6zbPnQti1saKymSikebUhRNZb7LK`). Vercel reported READY. This deployment includes the local uncommitted rail fixes; it is not identified solely by the branch's HEAD commit. Production was not deployed or promoted.
+- Deployment protection remains enabled. Used authenticated `vercel curl` requests for MCP initialization, tools/list and four bounded live tool calls. Initialization succeeded; discovery exposed exactly 12 tools including both rail tools.
+- Vercel-origin live calls passed: HHL by name and CRS (five services each), CDF → HHL (four), CDF → HLL (three). Verified requested station/destination, result bounds, status values, National Rail attribution and null departure predictions for cancellations where present. Both provider subscriptions worked from Vercel. Counts are dated observations, not canary assertions.
+- No keys or raw live responses were persisted in this acceptance record. Full terms/branding review, assistant comparisons, Vercel provider-failure acceptance, production activation/canary changes and production checks remain pending. Next.js security warning remains unresolved; no dependency upgrade was performed.

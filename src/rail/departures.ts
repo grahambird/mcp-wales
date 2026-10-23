@@ -57,7 +57,7 @@ export async function liveDepartures(station: string, destinationName: string | 
     status: board.areServicesAvailable === false ? "services_unavailable" : services.length ? "ok" : "no_services",
     explanation: board.areServicesAvailable === false ? "National Rail has suppressed services for this station; check the official departure board." : services.length ? null : "No matching direct trains were returned in the API's next 120 minutes. This does not establish that the last train has departed.",
     source_url: "https://www.nationalrail.co.uk/live-trains/departures/" + origin.crs.toLowerCase() + "/",
-    attribution: "Powered by National Rail Enquiries. Contains information licensed under the National Rail Enquiries Open Government Licence.",
+    attribution: "Powered by National Rail. Contains information licensed under the National Rail Enquiries Open Government Licence.",
     limitations: "Direct trains only. Up to 10 services supplied by Darwin in a 120-minute window, sorted by expected departure where known, otherwise scheduled time. This is not an exhaustive timetable. Cancellations are not available trains; unknown predictions are not confirmation of punctuality. Ambiguous or uncertain clock times are null. Live information can change after retrieval.",
   };
 }

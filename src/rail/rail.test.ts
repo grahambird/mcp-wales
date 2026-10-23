@@ -1,6 +1,6 @@
 import railPrompts from "../../scripts/fixtures/rail-prompts.json";
 import { beforeEach, afterEach, describe, expect, it, vi } from "vitest";
-import { clearRailStateForTests } from "./client";
+import { clearRailStateForTests, getRailDetail } from "./client";
 import { resolveStation, StationError } from "./stations";
 import { railTime } from "./time";
 import { runLiveDepartures, runNextTrains } from "@/mcp/rail-tools";
@@ -28,6 +28,8 @@ beforeEach(() => {
   clearRailStateForTests();
   vi.stubEnv("NATIONAL_RAIL_API_KEY", "test-secret-do-not-leak");
   vi.stubEnv("NATIONAL_RAIL_API_BASE_URL", "https://api1.raildata.org.uk/test-product/LDBWS/api/20220120");
+  vi.stubEnv("NATIONAL_RAIL_SERVICE_DETAILS_API_KEY", "detail-secret-do-not-leak");
+  vi.stubEnv("NATIONAL_RAIL_SERVICE_DETAILS_API_BASE_URL", "https://api1.raildata.org.uk/1010-service-details1_2/LDBWS/api/20220120");
   vi.spyOn(console, "info").mockImplementation(() => {});
   vi.spyOn(console, "warn").mockImplementation(() => {});
 });
@@ -70,7 +72,9 @@ describe("Darwin tools", () => {
     const fetcher = mockBoard([service(), service("other", { destination: [{ locationName: "Barry Island", crs: "BYI" }] })]);
     const call = await runLiveDepartures({ station: "CDF" });
     expect(result(call).result.services).toHaveLength(2);
-    expect(fetcher.mock.calls[0][0]).toContain("filterCrs=null");
+    const query = new URL(fetcher.mock.calls[0][0]).searchParams;
+    expect(query.has("filterCrs")).toBe(false);
+    expect(query.has("filterType")).toBe(false);
   });
   it("includes overdue delayed services and sorts by predictions before applying limit", async () => {
     mockBoard([service("late", { std: "12:50", etd: "13:20" }), service("next", { std: "13:05" })]);
@@ -184,7 +188,8 @@ it("bounds concurrent detail requests to two and never exposes credentials in th
   let active = 0; let maximum = 0;
   const fetcher = vi.fn(async (url: string, options: RequestInit) => {
     expect(url).not.toContain("test-secret-do-not-leak");
-    expect(options.headers).toMatchObject({ "x-apikey": "test-secret-do-not-leak" });
+    expect(url).not.toContain("detail-secret-do-not-leak");
+    expect(options.headers).toMatchObject({ "x-apikey": url.includes("GetServiceDetails") ? "detail-secret-do-not-leak" : "test-secret-do-not-leak" });
     expect(options.redirect).toBe("error");
     if (!url.includes("GetServiceDetails")) return Response.json({ generatedAt, crs: "CDF", trainServices: Array.from({ length: 10 }, (_, i) => service(String(i))) });
     active++; maximum = Math.max(maximum, active);
@@ -208,4 +213,35 @@ it.each(railPrompts)("executes the expected prompt contract: $prompt", async fix
     : await runNextTrains({ from_station: fixture.arguments.from_station!, to_station: fixture.arguments.to_station! });
   if (fixture.arguments.station === "imaginary station") expect(call.structuredContent).toMatchObject({ error: "unknown_station" });
   else expect(result(call).result.origin.crs).toBe(fixture.tool === "get_next_trains" ? "CDF" : fixture.arguments.station === "Heath Low Level" ? "HLL" : "HHL");
+});
+
+
+describe("separate Marketplace products", () => {
+  it("routes each operation with only its subscription key", async () => {
+    const fetcher = mockBoard();
+    result(await next());
+    expect(fetcher.mock.calls.map(([url]) => url)).toEqual([
+      expect.stringContaining("https://api1.raildata.org.uk/test-product/LDBWS/api/20220120/GetDepBoardWithDetails/CDF?"),
+      "https://api1.raildata.org.uk/1010-service-details1_2/LDBWS/api/20220120/GetServiceDetails/one",
+    ]);
+  });
+  it.each([
+    ["NATIONAL_RAIL_SERVICE_DETAILS_API_KEY", ""],
+    ["NATIONAL_RAIL_SERVICE_DETAILS_API_BASE_URL", ""],
+    ["NATIONAL_RAIL_SERVICE_DETAILS_API_BASE_URL", "https://attacker.invalid/product/LDBWS/api/20220120"],
+    ["NATIONAL_RAIL_SERVICE_DETAILS_API_BASE_URL", "http://api1.raildata.org.uk/product/LDBWS/api/20220120"],
+    ["NATIONAL_RAIL_SERVICE_DETAILS_API_BASE_URL", "https://api1.raildata.org.uk/product/LDBWS/api/20220120?redirect=elsewhere"],
+  ])("rejects invalid detail configuration: %s = %s", async (name, value) => {
+    const fetcher = mockBoard();
+    vi.stubEnv(name, value);
+    await expect(getRailDetail("one", Date.now() + 20000)).rejects.toMatchObject({ code: "unavailable" });
+    expect(fetcher).not.toHaveBeenCalled();
+  });
+  it("does not reuse cached details from a different product URL", async () => {
+    const fetcher = mockBoard();
+    await getRailDetail("one", Date.now() + 20000);
+    vi.stubEnv("NATIONAL_RAIL_SERVICE_DETAILS_API_BASE_URL", "https://api1.raildata.org.uk/other-product/LDBWS/api/20220120");
+    await getRailDetail("one", Date.now() + 20000);
+    expect(fetcher).toHaveBeenCalledTimes(2);
+  });
 });

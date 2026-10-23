@@ -11,9 +11,9 @@ Retain all ten default tools. Prioritise proving their usefulness and making mai
 
 Name/rating sorting for food and name/pupil-total sorting for schools already exist. Food inspection-date sorting is unavailable in the consumed live API. A general postcode, distance or neighbourhood resolver is not currently exposed. See [the tool guide](docs/TOOLS.md) for exact contracts.
 
-## Rail integration awaiting access
+## Rail integration awaiting live acceptance
 
-Two gated direct-train tools now have a Darwin JSON connector and local station resolver. Marketplace approval, verification of multiple intermediate-stop results, provider authentication/terms, assistant comparisons and production acceptance remain pending. See [rail activation](docs/rail.md). Existing default tools remain unchanged.
+Two gated direct-train tools now have a Darwin JSON connector and local station resolver. The user has Marketplace access and supplied separate departure-board and Service Details endpoints with `x-apikey` authentication. Local live checks now authenticate both products and return multiple intermediate-stop results. Independent official-board comparisons, full terms/quotas checks, assistant comparisons and production acceptance remain pending. See [rail activation](docs/rail.md). Existing default tools remain unchanged.
 
 ## Next priorities
 
