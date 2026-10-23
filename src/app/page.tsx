@@ -6,6 +6,12 @@ import styles from "./page.module.css";
 const endpoint = "https://mcp.wales/mcp";
 const capabilities = [
   {
+    title: "Live trains",
+    description: "Check upcoming departures, platforms, delays and cancellations, or find the next direct train between stations. Start with Welsh journeys; rail coverage extends across Great Britain.",
+    prompts: ["When is the next train from Heath High Level into Cardiff?", "When is the next train from Cardiff Central to Heath High Level?", "Show departures from Cardiff Queen Street"],
+    note: "Times use the UK local time zone. Direct trains only, within the next two hours; no tickets or journeys requiring changes. Live information can change.",
+  },
+  {
     title: "Census 2021",
     description: "Explore official ONS population, age profiles and Welsh-speaking ability for Cardiff wards and MSOAs, and compare Welsh local authorities.",
     prompts: ["Compare the age profiles of Llanishen and Grangetown", "Which Cardiff wards had the highest proportion of Welsh speakers in 2021?", "Compare Cardiff and Swansea’s Census 2021 populations"],
@@ -37,7 +43,7 @@ export default function Home() {
           <span>MCP Wales</span>
         </h1>
         <p className={styles.intro}>Give your AI assistant local knowledge.</p>
-        <p className={styles.summary}>An open-source, read-only connector for trusted local and public data in Wales, starting with Cardiff. Census comparisons cover Welsh local authorities; neighbourhood statistics, food businesses and schools currently cover Cardiff.</p>
+        <p className={styles.summary}>An open-source, read-only connector for trusted local and public data in Wales, starting with Cardiff. Census comparisons cover Welsh local authorities; neighbourhood statistics, food businesses and schools currently cover Cardiff. Live National Rail departures cover Great Britain.</p>
         <nav className={styles.actions} aria-label="Useful links">
           <a className={styles.primaryLink} href="#connect">Connect your assistant <span aria-hidden="true">↓</span></a>
           <a href="https://github.com/grahambird/mcp-wales">View on GitHub <span aria-hidden="true">↗</span></a>
@@ -67,6 +73,8 @@ export default function Home() {
       <section className={styles.section} aria-labelledby="tools-heading">
         <h2 id="tools-heading">Tools included</h2>
         <dl className={styles.tools}>
+          <div><dt><code>get_live_departures</code></dt><dd>Check upcoming departures from a station, including final destinations, platforms, delays and cancellations.</dd></div>
+          <div><dt><code>get_next_trains</code></dt><dd>Find the next direct trains between two stations, with departure and arrival times and confirmed calling points.</dd></div>
           <div><dt><code>find_food_businesses</code></dt><dd>Search Cardiff food businesses by name, broad business type and minimum hygiene rating. Optional ward filtering uses a dated snapshot.</dd></div>
           <div><dt><code>get_food_business</code></dt><dd>Retrieve inspection details for a Cardiff business using its FSA establishment ID, typically from a search result.</dd></div>
           <div><dt><code>find_schools</code></dt><dd>Search the Cardiff maintained-school directory by name, phase, language group and ward.</dd></div>
@@ -81,6 +89,8 @@ export default function Home() {
       </section>
       <section className={styles.section} aria-labelledby="sources-heading">
         <h2 id="sources-heading">About the data</h2>
+        <p>Live train information is powered by <a href="https://www.nationalrail.co.uk/">National Rail</a>, using Darwin departure boards and service details. Results include scheduled and expected times in UK local time, retrieval times and official departure-board links. Cancelled trains are clearly marked. Up to ten services are checked within a two-hour window; results are not a complete timetable or journey planner. Coverage includes Great Britain, not Northern Ireland.</p>
+        <p className={styles.note}>Powered by National Rail. Contains information licensed under the National Rail Enquiries Open Government Licence.</p>
         <p>Food hygiene ratings come from the <a href="https://ratings.food.gov.uk/">Food Standards Agency</a> and reflect standards found on the inspection date. They do not assess food quality or provide menus, opening hours, bookings or availability. Ratings can change; results include inspection dates and official source links.</p>
         <p>School details come from a manually refreshed snapshot of the <a href="https://www.gov.wales/addresses-and-phone-numbers-schools-and-pupil-referral-units">Welsh Government school register</a>. Results include publication and import dates. School profiles also include published <a href="https://stats.gov.wales/en-GB/2018f447-f4c0-438d-bb88-2a72af967724">StatsWales</a> pupil and FSM statistics with their census dates. FSM eligibility differs from universal primary meal provision. Counts may be rounded or suppressed. These figures do not measure school quality or provide live enrolment, catchments, inspections or performance results.</p>
         <p>Census statistics are queried from the <a href="https://developer.ons.gov.uk/censusobservations/">Office for National Statistics API</a>. They describe Census Day, 21 March 2021, rather than current population estimates. Welsh-speaking percentages cover residents aged three or over. Wards use May 2022 boundaries; approximate neighbourhood matches require an explicit area selection. Disclosure control can cause small differences between topic totals.</p>

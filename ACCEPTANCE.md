@@ -244,3 +244,10 @@ Automated offline checks and local live acceptance are recorded separately when 
 
 - Following the UK-local timestamp deployment, the user retested the reported Heath High Level into Cardiff question and confirmed it is now working as expected. This records user-reported assistant acceptance for that scenario; the agent did not independently inspect the new chat or its raw tool calls.
 - This closes the pending user retest for the reported incident. It does not establish a broader assistant evaluation or conclusively reconstruct the original failure.
+
+
+## 23 October 2026 — public rail feature information
+
+- Updated the homepage with a Live trains capability card, three Welsh example prompts, both rail tools, Great Britain coverage, UK-local times, direct-train/two-hour limitations and National Rail attribution. Updated page metadata.
+- Updated README coverage, tool discovery counts, operations, privacy recipients/cache information, roadmap and current rail status to reflect production availability and the user's successful incident retest. Historical dated acceptance entries remain intact; no broader assistant evaluation is claimed.
+- `npm run check` passed lint, types, 240 Vitest tests, six maintenance tests, production build and runtime-bundle check. `git diff --check` passed. Initial type checking encountered duplicate ignored generated type copies; these were moved aside to temporary storage. No tool or connector behaviour changed.

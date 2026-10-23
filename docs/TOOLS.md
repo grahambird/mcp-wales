@@ -15,7 +15,7 @@ Availability is account- and workspace-dependent. It was observed on the project
 1. Use ChatGPT on the web and confirm **Plugins → Add Custom MCP Server** is available.
 2. Enter a name such as `MCP Wales` and the full `https://mcp.wales/mcp` URL.
 3. Choose no authentication, review the risk warning, create the connection, and install it.
-4. Confirm the four food/school tools and four census tools below are discoverable.
+4. Confirm the twelve production tools below are discoverable: six food/school tools, four Census tools and two rail tools.
 5. Try:
    - “Find cafés in Cardiff with a food hygiene rating of 5.”
    - “What is the hygiene rating and inspection date for this Cardiff restaurant?”

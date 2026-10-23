@@ -4,7 +4,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "MCP Wales",
-  description: "Trusted local and public data in Wales, starting with Cardiff food hygiene ratings and maintained-school profiles.",
+  description: "Connect your AI assistant to Welsh Census statistics, Cardiff schools and food hygiene records, plus live National Rail departures across Great Britain.",
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {

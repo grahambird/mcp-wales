@@ -13,7 +13,7 @@ Name/rating sorting for food and name/pupil-total sorting for schools already ex
 
 ## Rail integration live
 
-Two optional direct-train tools are enabled in production. Local and Vercel Preview/production checks passed on 23 October 2026, and the user compared local results with National Rail boards. Actual assistant comparisons remain pending; the user chose to test via the existing production connection. Subscription credit and fair-use wording are user-reported; a full independent terms/branding audit has not been performed. See [rail operations](docs/rail.md). The ten non-rail tools remain independent.
+Two optional direct-train tools are enabled in production. Local and Vercel Preview/production checks passed on 23 October 2026, and the user compared local results with National Rail boards. The user confirmed the Heath High Level into Cardiff assistant retest passed after UK-local timestamp improvements; broader assistant comparisons remain pending. Subscription credit and fair-use wording are user-reported; a full independent terms/branding audit has not been performed. See [rail operations](docs/rail.md). The ten non-rail tools remain independent.
 
 ## Next priorities
 

@@ -8,11 +8,12 @@ Visit [mcp.wales](https://mcp.wales). Connect an MCP client to `https://mcp.wale
 | --- | --- | --- |
 | Food hygiene | `find_food_businesses`, `get_food_business`, `summarize_food_businesses_by_ward` | Cardiff; live records, dated snapshots for ward searches/aggregates |
 | Schools | `find_schools`, `get_school`, `summarize_schools_by_ward` | Cardiff maintained schools; manually refreshed register and StatsWales snapshots |
+| Live trains | `get_live_departures`, `get_next_trains` | Great Britain; live National Rail departures and direct trains, with UK-local times |
 | Census 2021 | `find_census_areas`, `get_area_demographics`, `compare_area_demographics`, `rank_areas_by_demographic` | All 22 Welsh local authorities and Cardiff wards/MSOAs; live requests to pinned historical datasets |
 
 Food ratings describe hygiene, not food quality. School statistics describe their published census period, and Census 2021 figures describe 2021 rather than today's population. Responses include source information and dates.
 
-Two live rail tools are enabled in production: `get_live_departures` and `get_next_trains`, covering direct National Rail services across Great Britain. Local, Preview and production checks passed on 23 October 2026; actual assistant selection remains to be tested. Rail remains optional through its enable flag. See [rail setup and limitations](docs/rail.md).
+Two live rail tools are enabled in production: `get_live_departures` and `get_next_trains`, covering direct National Rail services across Great Britain. Local, Preview and production checks passed on 23 October 2026; the user also confirmed a successful assistant retest after UK-local timestamp improvements. Broader assistant comparisons remain pending. Rail remains optional through its enable flag. See [rail setup and limitations](docs/rail.md).
 
 The waste-collection prototype is disabled by default pending reuse and release checks. See [operations](docs/OPERATIONS.md#waste-collection-spike).
 
