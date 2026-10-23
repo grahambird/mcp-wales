@@ -1,6 +1,12 @@
-# Live National Rail departures — awaiting live acceptance
+# Live National Rail departures — optional, enabled in production
 
 The two questions are “When is the next train from Heath High Level?” and “When is the next train to Heath High Level from Cardiff Central?”. Only direct passenger trains are supported, across Great Britain. Northern Ireland is outside Darwin coverage. No journey planner, tickets, database, new dependencies or extra hosting.
+
+## Production status — 23 October 2026
+
+Enabled at `https://mcp.wales/mcp` from Git revision `1b91aba`, with Next.js patched to 16.4.3. Production discovery exposed 12 tools; the full existing smoke client and all four bounded live rail cases passed. The daily production workflow now expects rail discovery and runs rail contracts. The user deferred separate Preview assistant setup; actual assistant selection/interpretation remains pending through the existing production connection. Full independent terms/branding review and live provider-failure exercises were not performed. See ACCEPTANCE.md for exact evidence.
+
+To disable rail, remove `NATIONAL_RAIL_TOOLS_ENABLED` or set it to `false` and redeploy. Existing non-rail tools do not depend on rail; remove unused subscription secrets separately if retiring the feature.
 
 ## API investigation (22 October 2026)
 
@@ -10,7 +16,7 @@ Read the official [JSON documentation](https://realtime.nationalrail.co.uk/LDBWS
 
 The smallest candidate workaround is one `GetDepBoardWithDetails/{crs}` request with `numRows=10`, `filterCrs=<destination>`, `filterType=to`, `timeOffset=0`, `timeWindow=120`. It returns multiple services and subsequent calling points. The implementation independently requires a matching subsequent calling point and excludes groups explicitly requiring a change or a non-train leg. It preserves cancellations at the origin, the requested stop and associated portions. Without a destination the board is unfiltered, so both directions are eligible.
 
-**Unresolved upstream contract:** the OpenAPI description says the board filter matches originating/terminating locations. It does not explicitly establish that intermediate destinations are included. Consequently, mocked tests do not prove this workaround works for CDF → HHL. Do not enable production until live acceptance proves multiple intermediate-stop results. An empty filtered board is not evidence that no direct route exists. If live checks show the filter only matches final destinations, this implementation must change before activation: inspect unfiltered departure-board services with calling points/service details within explicit provider bounds, and disclose truncation. Do not disguise a capped sample as all upcoming direct trains or build a journey planner.
+**Original upstream uncertainty (live sample subsequently verified):** the OpenAPI description says the board filter matches originating/terminating locations. It does not explicitly establish that intermediate destinations are included. Mocked tests alone do not prove this workaround works for CDF → HHL. Local and production checks subsequently returned multiple matching services; the user compared the local sample with the official boards. An empty filtered board is not evidence that no direct route exists. If live checks show the filter only matches final destinations, this implementation must change before activation: inspect unfiltered departure-board services with calling points/service details within explicit provider bounds, and disclose truncation. Do not disguise a capped sample as all upcoming direct trains or build a journey planner.
 
 `GetServiceDetails/{serviceId}` exposes actual departure `atd`, which board items lack. Up to ten bounded detail calls exclude confirmed departures without dropping trains merely because their scheduled/expected time is past. An expired/null detail, malformed response or failed detail call fails the operation as unavailable, rather than pretending there are no trains. The connector uses the board's generation time for its HH:mm values, converts known times to ISO UTC with Europe/London clock rules, and returns null for uncertain/repeated autumn clock times. No timetable-derived prediction is invented.
 
@@ -18,7 +24,7 @@ The public schema's host is `localhost`/HTTP and its documentation describes Bas
 
 ## Local live evidence — 23 October 2026
 
-Both product keys authenticated through the local MCP server. The bounded smoke passed HHL by name and CRS (five results each), CDF → HHL (four) and CDF → HLL (three). Destination results require matching subsequent calling points, confirming multiple intermediate-stop results for this sample. Counts are observations, not invariants. A live-discovered HTTP 400 for literal `filterCrs=null` was fixed by omitting optional filters when no destination is requested; regression coverage asserts omission. The user subsequently compared results retrieved at 19:15:44–45 BST with National Rail boards and reported agreement, with roughly one-minute differences in revised delayed-train departure predictions. This is user-reported acceptance for the sample, not a synchronized feed audit. Protected Vercel Preview initialization, 12-tool discovery and all four bounded live rail cases subsequently passed on 23 October 2026 using authenticated CLI requests; both product subscriptions work from Vercel. See ACCEPTANCE.md for the deployment URL and exact scope. Production acceptance below remains pending.
+Both product keys authenticated through the local MCP server. The bounded smoke passed HHL by name and CRS (five results each), CDF → HHL (four) and CDF → HLL (three). Destination results require matching subsequent calling points, confirming multiple intermediate-stop results for this sample. Counts are observations, not invariants. A live-discovered HTTP 400 for literal `filterCrs=null` was fixed by omitting optional filters when no destination is requested; regression coverage asserts omission. The user subsequently compared results retrieved at 19:15:44–45 BST with National Rail boards and reported agreement, with roughly one-minute differences in revised delayed-train departure predictions. This is user-reported acceptance for the sample, not a synchronized feed audit. Protected Vercel Preview initialization, 12-tool discovery and all four bounded live rail cases subsequently passed on 23 October 2026 using authenticated CLI requests; both product subscriptions work from Vercel. See ACCEPTANCE.md for the deployment URL and exact scope. Production discovery, the full existing smoke client and all four rail cases subsequently passed; see production status above.
 
 ## Configuration and acceptance after account approval
 
@@ -34,7 +40,7 @@ NATIONAL_RAIL_SERVICE_DETAILS_API_BASE_URL=https://api1.raildata.org.uk/1010-ser
 NATIONAL_RAIL_TOOLS_ENABLED=true
 ```
 
-The tools are absent from discovery unless the explicit enable flag is true. Missing/invalid configuration produces an execution error with code `unavailable`. Existing tools require no rail credentials. Keep production disabled until the following are recorded:
+The tools are absent from discovery unless the explicit enable flag is true. Missing/invalid configuration produces an execution error with code `unavailable`. Existing tools require no rail credentials. The original activation checklist is retained below. Performed checks and explicit pending items are recorded in ACCEPTANCE.md; do not infer that every item was performed from production activation.
 
 Use each product’s own Consumer Key from its subscription. The connector requires both keys and both URLs; it does not assume keys are interchangeable. The board product supplies `GetDepBoardWithDetails/{crs}`; the separate details product supplies `GetServiceDetails/{serviceid}`.
 

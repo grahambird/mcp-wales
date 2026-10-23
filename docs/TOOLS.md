@@ -117,7 +117,7 @@ School location is not catchment, admission eligibility or pupils’ residence. 
 
 FSA ward outputs identify `data_mode: snapshot`, extract/retrieval dates, age and a warning after 30 days. `get_food_business` remains live and may disagree with a historical snapshot; it shows pending geography if its location changed. Census uses native ward statistics from 2021 on May 2022 boundaries. A shared ward code does not make establishment and Census reporting periods contemporary. See [matching, provenance and limitations](geography.md).
 
-## Rail departures — gated pending marketplace approval and live checks
+## Rail departures — optional, enabled in production
 
 `get_live_departures` accepts `station` (full National Rail name or CRS) and `limit` (1–10, default 5) for upcoming trains in both directions. `get_next_trains` accepts `from_station`, `to_station` and the same limit for direct trains calling at the requested destination, including intermediate stations. Both cover Great Britain. They appear only with `NATIONAL_RAIL_TOOLS_ENABLED=true` after the [rail activation checks](rail.md).
 

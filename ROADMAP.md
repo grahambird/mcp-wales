@@ -11,9 +11,9 @@ Retain all ten default tools. Prioritise proving their usefulness and making mai
 
 Name/rating sorting for food and name/pupil-total sorting for schools already exist. Food inspection-date sorting is unavailable in the consumed live API. A general postcode, distance or neighbourhood resolver is not currently exposed. See [the tool guide](docs/TOOLS.md) for exact contracts.
 
-## Rail integration awaiting live acceptance
+## Rail integration live
 
-Two gated direct-train tools now have a Darwin JSON connector and local station resolver. The user has Marketplace access and supplied separate departure-board and Service Details endpoints with `x-apikey` authentication. Local live checks now authenticate both products and return multiple intermediate-stop results. Independent official-board comparisons, full terms/quotas checks, assistant comparisons and production acceptance remain pending. See [rail activation](docs/rail.md). Existing default tools remain unchanged.
+Two optional direct-train tools are enabled in production. Local and Vercel Preview/production checks passed on 23 October 2026, and the user compared local results with National Rail boards. Actual assistant comparisons remain pending; the user chose to test via the existing production connection. Subscription credit and fair-use wording are user-reported; a full independent terms/branding audit has not been performed. See [rail operations](docs/rail.md). The ten non-rail tools remain independent.
 
 ## Next priorities
 
@@ -37,6 +37,6 @@ Start with a demonstrated user question and the [tool checklist](docs/tool-desig
 | Current population estimates | Separate source and reporting dates, clearly distinct from Census 2021 |
 | Waste collections | Existing reuse, attribution and release gate in [Operations](docs/OPERATIONS.md#waste-collection-spike) |
 
-Other source ideas remain unprioritised: UK-AIR air quality, OS Open Greenspace, Cadw listed buildings, visitor attractions, police crime data, NaPTAN stops, Cardiff Bus open data, National Rail Darwin, post offices/postboxes, planning applications, further/higher education and local representatives. Access and reuse terms need review when a concrete question warrants one.
+Other source ideas remain unprioritised: UK-AIR air quality, OS Open Greenspace, Cadw listed buildings, visitor attractions, police crime data, NaPTAN stops, Cardiff Bus open data, post offices/postboxes, planning applications, further/higher education and local representatives. Access and reuse terms need review when a concrete question warrants one.
 
 Do not scrape unsupported endpoints, introduce school-quality rankings or add infrastructure in anticipation of these options. Follow [QUALITY.md](QUALITY.md#adoption-triggers).

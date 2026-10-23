@@ -14,7 +14,7 @@ Use the smallest quality system that provides useful confidence. Mocked contract
 | Census | Official area resolution and ambiguity, supported topics, category ordering, topic-specific denominators, age 65 and 100+, complete rankings, ties and bounded requests |
 | Geography | Coordinate containment, holes/multipolygons/edges/overlaps/gaps, postcode quality and termination, partial resolution, association reuse/invalidation and complete population reconciliation |
 | Service | Cache bounds/expiry/deduplication, concurrency/deadlines/cooldowns, request and response limits, Origin validation, safe errors/logs, untrusted content, nested output schemas and legacy/current MCP compatibility |
-| Gated rail | Name/CRS resolution, intermediate calls and changes, actual departures, delays/cancellations, London clocks, bounded cache/retries/cooldown, malformed/failed providers and secret-safe results; live filtering pending |
+| Gated rail | Name/CRS resolution, intermediate calls and changes, actual departures, delays/cancellations, London clocks, bounded cache/retries/cooldown, malformed/failed providers and secret-safe results; dated live filtering evidence in acceptance |
 | Gated waste | Explicit address selection, string UPRNs, malformed/empty schedules, unknown source labels, throttling, caches and privacy-safe logging; no real residential fixtures |
 
 Sorting applies to the complete matching population before pagination: locally for snapshots, upstream where supported. Never sort a page as though it were the complete dataset or exhaust an upstream API to simulate unsupported sorting.
@@ -29,7 +29,8 @@ Synthetic fixtures control mutable behaviour. Dated bundled geography examples c
 
 The [scheduled smoke client](.github/workflows/production-smoke.yml) checks:
 
-- Discovery of all ten default read-only tools.
+- Discovery of all ten default read-only tools and the two enabled rail tools.
+- Bounded live rail contracts for station resolution, both Heath routes, result/status shapes, cancellation predictions and attribution. No fixed service values.
 - Bounded live FSA search and dynamically selected detail, valid ratings, Cardiff scope, attribution and source links.
 - Dynamically selected school discovery/profile, identifiers, source dates and statistical value/status shapes.
 - Cardiff Census population and a bounded complete-area ward ranking, official codes, historical dates, topic denominators, percentage arithmetic, unrounded ordering and attribution.

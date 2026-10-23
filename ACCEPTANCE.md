@@ -217,3 +217,12 @@ Automated offline checks and local live acceptance are recorded separately when 
 - Integrated main's newer school descriptions, discovery instructions and snapshot annotations, preserving gated rail registration and adding gated rail guidance to the current instructions. Preserved both branches' acceptance history and tests. Restored the user's previously saved acceptance-checkbox edit; its named Git stash remains available.
 - Updated the daily production workflow to expect the two enabled rail tools and run bounded rail contracts, without fixed train names, IDs, counts, platforms or times.
 - Full merged checks passed: lint, TypeScript, 239 Vitest tests, six maintenance tests, Next.js 16.4.3 production build and runtime-bundle checks. Production deployment and post-deployment results will be recorded separately.
+
+
+## 23 October 2026 — production rail enabled and checked
+
+- Published tested release `1b91aba5865e864a1e99f055982ea0cbc95071c8` to main. Vercel's Git integration deployed it to Production as `dpl_64oe8UFDUMaZXweAxekGteMcvyJp`, URL https://mcp-wales-8eqno019d-grahambirds-projects.vercel.app, READY and aliased to https://mcp.wales. Set `NATIONAL_RAIL_TOOLS_ENABLED=true` for Production before deployment; existing rail credentials stayed server-only.
+- Ran `NATIONAL_RAIL_TOOLS_ENABLED=true npm run smoke:client -- https://mcp.wales`: passed production discovery of all 12 tools and existing FSA, school, Census and ward-summary checks.
+- Ran `node scripts/test-rail-client.mjs https://mcp.wales`: passed HHL full-name and CRS departures (five services each), CDF → HHL (four) and CDF → HLL (three). Counts are dated observations only. This establishes production-origin provider access, not actual assistant selection or interpretation.
+- The user explicitly chose to defer separate assistant Preview setup and test through the existing production connection. Actual assistant testing remains pending. Full independent subscription terms/branding audit, live provider-failure exercises and hosting log/firewall configuration review were not performed.
+- Release includes Next.js 16.4.3, zero known vulnerabilities reported by installation audit, the latest main discovery improvements, and the updated daily rail-aware canary. `git diff --check` passed for the release documentation update.
