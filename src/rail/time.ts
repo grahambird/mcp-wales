@@ -1,5 +1,5 @@
 const clock = new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/London", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hourCycle: "h23" });
-/** Resolve a board's HH:mm against its generation time, including midnight and BST.
+/** Resolve a board's HH:mm to a UK-local ISO timestamp with its UTC offset.
  * Repeated autumn clock times are ambiguous in Darwin's public format: retain null.
  */
 export function railTime(value: string | null | undefined, reference: string): string | null {
@@ -21,7 +21,14 @@ export function railTime(value: string | null | undefined, reference: string): s
   if (!candidates.length || Math.abs(candidates[0] - anchor) > 12 * 3600000) return null;
   // Both occurrences on the same local day are plausible; never invent a DST offset.
   if (candidates.some(t => t !== candidates[0] && Math.abs(t - candidates[0]) === 3600000)) return null;
-  return new Date(candidates[0]).toISOString();
+  const chosen = candidates[0];
+  const local = Object.fromEntries(clock.formatToParts(chosen).map(p => [p.type, p.value]));
+  const localEpoch = Date.UTC(+local.year, +local.month - 1, +local.day, +local.hour, +local.minute);
+  const offset = (localEpoch - chosen) / 60000;
+  const sign = offset < 0 ? "-" : "+";
+  const hours = String(Math.floor(Math.abs(offset) / 60)).padStart(2, "0");
+  const minutes = String(Math.abs(offset) % 60).padStart(2, "0");
+  return `${local.year}-${local.month}-${local.day}T${local.hour}:${local.minute}:00.000${sign}${hours}:${minutes}`;
 }
 export function prediction(scheduled: string | null, raw: string | null | undefined) {
   if (raw === "On time") return { time: scheduled, information: "live" as const };

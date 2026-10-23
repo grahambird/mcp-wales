@@ -6,7 +6,7 @@ import { railTime } from "./time";
 import { runLiveDepartures, runNextTrains } from "@/mcp/rail-tools";
 import { outputSchemas } from "@/mcp/output-schemas";
 
-const generatedAt = "2026-10-22T12:00:00Z"; // 13:00 BST
+const generatedAt = "2026-10-22T13:00:00.000+01:00"; // 13:00 BST
 const destination = [{ locationName: "Rhymney", crs: "RHY" }];
 function service(id = "one", changes: object = {}) {
   return { serviceID: id, std: "13:05", etd: "On time", destination, serviceType: "train", subsequentCallingPoints: [{ serviceType: "train", serviceChangeRequired: false, callingPoint: [{ locationName: "Heath High Level", crs: "HHL", st: "13:17", et: "13:20" }] }], ...changes };
@@ -56,7 +56,7 @@ describe("Darwin tools", () => {
     const { result: value } = result(await next());
     expect(value.services).toHaveLength(2);
     expect(value.destination).toEqual({ name: "Heath High Level", crs: "HHL" });
-    expect(value.services[0]).toMatchObject({ final_destinations: [{ name: "Rhymney", crs: "RHY" }], platform: null, scheduled_arrival: "2026-10-22T12:17:00.000Z", expected_arrival: "2026-10-22T12:20:00.000Z", departure_information: "live" });
+    expect(value.services[0]).toMatchObject({ final_destinations: [{ name: "Rhymney", crs: "RHY" }], platform: null, scheduled_arrival: "2026-10-22T13:17:00.000+01:00", expected_arrival: "2026-10-22T13:20:00.000+01:00", departure_information: "live" });
     expect(fetcher.mock.calls[0][0]).toContain("filterCrs=HHL");
   });
   it("never substitutes direction, final destination or a connecting service for a confirmed stop", async () => {
@@ -81,7 +81,7 @@ describe("Darwin tools", () => {
     const values = result(await next()).result.services;
     expect(values.map(s => s.status)).toEqual(["on_time", "delayed"]);
     expect(values[1].delay_minutes).toBe(30);
-    expect(result(await next({ limit: 1 })).result.services[0].scheduled_departure).toBe("2026-10-22T12:05:00.000Z");
+    expect(result(await next({ limit: 1 })).result.services[0].scheduled_departure).toBe("2026-10-22T13:05:00.000+01:00");
   });
   it("excludes confirmed actual departures but retains an overdue unknown prediction", async () => {
     const fetcher = mockBoard([service("gone"), service("unknown", { std: "12:59", etd: "No report" })]);
@@ -167,11 +167,11 @@ describe("Darwin tools", () => {
 });
 describe("London clock handling", () => {
   it.each([
-    ["13:05", generatedAt, "2026-10-22T12:05:00.000Z"],
-    ["13:05", "2026-12-22T13:00:00Z", "2026-12-22T13:05:00.000Z"],
-    ["00:05", "2026-10-22T22:58:00Z", "2026-10-22T23:05:00.000Z"],
-    ["01:30", "2026-10-25T00:00:00Z", null],
-    ["01:30", "2026-03-29T00:30:00Z", null],
+    ["13:05", generatedAt, "2026-10-22T13:05:00.000+01:00"],
+    ["13:05", "2026-12-22T13:00:00.000+00:00", "2026-12-22T13:05:00.000+00:00"],
+    ["00:05", "2026-10-22T23:58:00.000+01:00", "2026-10-23T00:05:00.000+01:00"],
+    ["01:30", "2026-10-25T01:00:00.000+01:00", null],
+    ["01:30", "2026-03-29T00:30:00.000+00:00", null],
     ["13:05*", generatedAt, null],
     ["Delayed", generatedAt, null],
   ])("resolves %s against %s", (time, reference, expected) => expect(railTime(time, reference)).toBe(expected));
@@ -244,4 +244,25 @@ describe("separate Marketplace products", () => {
     await getRailDetail("one", Date.now() + 20000);
     expect(fetcher).toHaveBeenCalledTimes(2);
   });
+});
+
+
+it("keeps the earlier Heath train first and exposes UK clock times rather than UTC clock faces", async () => {
+  const generatedAt = "2026-10-23T19:47:00+01:00";
+  const services = [["earlier", "19:58", "20:08"], ["later", "21:01", "21:12"]].map(([id, std, arrival]) => service(id, {
+    std, destination: [{ locationName: "Cardiff Central", crs: "CDF" }],
+    subsequentCallingPoints: [{ callingPoint: [{ locationName: "Cardiff Central", crs: "CDF", st: arrival, et: "On time" }] }],
+  }));
+  vi.stubGlobal("fetch", vi.fn(async (url: string) => Response.json(url.includes("GetServiceDetails")
+    ? { crs: "HHL", etd: "On time" }
+    : { generatedAt, crs: "HHL", trainServices: services })));
+  const call = await runNextTrains({ from_station: "HHL", to_station: "CDF" });
+  const value = result(call).result;
+  expect(value.services.map(s => s.scheduled_departure)).toEqual([
+    "2026-10-23T19:58:00.000+01:00", "2026-10-23T21:01:00.000+01:00",
+  ]);
+  expect(value.services[0]).toMatchObject({ expected_departure: "2026-10-23T19:58:00.000+01:00", expected_arrival: "2026-10-23T20:08:00.000+01:00", status: "on_time" });
+  expect(value.services[1].scheduled_arrival).toBe("2026-10-23T21:12:00.000+01:00");
+  // The offset representation preserves the exact underlying instant.
+  expect(Date.parse(value.services[1].scheduled_departure!)).toBe(Date.parse("2026-10-23T20:01:00Z"));
 });

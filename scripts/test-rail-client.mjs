@@ -24,6 +24,13 @@ try {
       assert(["on_time", "delayed", "cancelled", "unknown"].includes(service.status));
       if (service.status === "cancelled") assert.equal(service.expected_departure, null);
       assert(service.platform === null || typeof service.platform === "string");
+      for (const field of ["scheduled_departure", "expected_departure", "scheduled_arrival", "expected_arrival"]) {
+        const time = service[field];
+        if (time === null) continue;
+        assert(/\+0[01]:00$/.test(time), `${field} must expose the UK local UTC offset`);
+        const local = new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/London", hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).format(new Date(time));
+        assert.equal(time.slice(11, 16), local, `${field} must show the UK clock time`);
+      }
     }
     console.log(JSON.stringify({ tool: name, from, to, status: value.status, count: value.services.length }));
   }
