@@ -10,7 +10,7 @@ Complete this after production deployment. Do not mark ChatGPT as tested based o
 - Equivalent production MCP client listed both tools: [x]
 - Production search invocation succeeded: [x]
 - Production detail invocation succeeded: [x]
-- ChatGPT web showed Add Custom MCP Server: [ ]
+- ChatGPT web showed Add Custom MCP Server: [x]
 - ChatGPT discovered exactly `find_food_businesses` and `get_food_business`: [ ]
 - Prompt: “Find cafés in Cardiff with a food hygiene rating of 5.”
 - Selected establishment name and FHRSID: `200 Degrees Coffee Shop` — `979940` (production MCP smoke test)
@@ -199,3 +199,21 @@ Automated offline checks and local live acceptance are recorded separately when 
 - Deployment protection remains enabled. Used authenticated `vercel curl` requests for MCP initialization, tools/list and four bounded live tool calls. Initialization succeeded; discovery exposed exactly 12 tools including both rail tools.
 - Vercel-origin live calls passed: HHL by name and CRS (five services each), CDF → HHL (four), CDF → HLL (three). Verified requested station/destination, result bounds, status values, National Rail attribution and null departure predictions for cancellations where present. Both provider subscriptions worked from Vercel. Counts are dated observations, not canary assertions.
 - No keys or raw live responses were persisted in this acceptance record. Full terms/branding review, assistant comparisons, Vercel provider-failure acceptance, production activation/canary changes and production checks remain pending. Next.js security warning remains unresolved; no dependency upgrade was performed.
+
+
+## 22 October 2026 — discovery instructions and tool annotations
+
+- Before editing, read production `initialize` and `tools/list` at `https://mcp.wales/mcp`: ten tools, the recently revised school descriptions, the original long server instructions and `openWorldHint=true` on every tool. These were successful read-only metadata requests, not ChatGPT selection tests.
+- Local changes introduce datasets and the reported school/year-group and Welsh-speaking ranking workflows in the first 512 characters. Snapshot-only tools declare `openWorldHint=false`; live-capable tools remain open-world. All tools remain explicitly read-only/non-destructive. Waste guidance is included only when the existing gate is enabled.
+- Exact reported prompts are added to the reusable fixtures; automated contracts and the school discovery/profile workflow do not establish model tool selection.
+- Pending: deployment of this revision, production verification of the updated instructions/annotations, refresh of the ChatGPT connection and fresh-chat retests of both reported prompts with actual client/model and results recorded. No improvement in actual selection is claimed yet.
+- Local verification passed: `npm run check` (lint, TypeScript, 182 Vitest tests, six maintenance tests, production build and runtime-bundle check) and `git diff --check`. The separate local rail branch remains at `f5a7176`; the earlier acceptance-checkbox edit is preserved.
+
+
+## 23 October 2026 — production rail release preparation
+
+- User agreed to defer separate assistant Preview testing because this is a single-user service; actual rail tool selection/interpretation remains unverified until tested via the existing production connection.
+- Upgraded Next.js from 16.4.0 to 16.4.3 after npm audit identified advisories affecting 16.4.0. Installation audit reported zero known vulnerabilities.
+- Integrated main's newer school descriptions, discovery instructions and snapshot annotations, preserving gated rail registration and adding gated rail guidance to the current instructions. Preserved both branches' acceptance history and tests. Restored the user's previously saved acceptance-checkbox edit; its named Git stash remains available.
+- Updated the daily production workflow to expect the two enabled rail tools and run bounded rail contracts, without fixed train names, IDs, counts, platforms or times.
+- Full merged checks passed: lint, TypeScript, 239 Vitest tests, six maintenance tests, Next.js 16.4.3 production build and runtime-bundle checks. Production deployment and post-deployment results will be recorded separately.
