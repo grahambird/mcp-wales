@@ -238,3 +238,9 @@ Automated offline checks and local live acceptance are recorded separately when 
 - Tool checklist: same read-only public rail tasks and provider boundaries; no new dependencies/infrastructure or tool parameters. Current official MCP specification/security guidance reconsulted; transport revisions and legacy compatibility unchanged. Actual assistant retest remains pending after deployment.
 
 - Deployed mitigation revision `0bce811f69619d880ec95b606fac3043c87a5a04` through main to Production deployment `dpl_5hq5TSA2oJ936vTLdFLZ6bxQSyi7`, READY at https://mcp-wales-lngj4f5qd-grahambirds-projects.vercel.app and aliased to mcp.wales. All four production rail contracts passed, including explicit UK-local timestamp/offset invariants. The original HHL → CDF case is covered synthetically and was checked live before deployment; post-deployment assistant retest remains pending.
+
+
+## 23 October 2026 — user rail assistant retest passed
+
+- Following the UK-local timestamp deployment, the user retested the reported Heath High Level into Cardiff question and confirmed it is now working as expected. This records user-reported assistant acceptance for that scenario; the agent did not independently inspect the new chat or its raw tool calls.
+- This closes the pending user retest for the reported incident. It does not establish a broader assistant evaluation or conclusively reconstruct the original failure.
